@@ -1,4 +1,4 @@
-%% batchRecon_dental_dual.m
+%% batchRecon_dental_multiple.m
 % Batch processing script for ddMRI_new cases
 %
 % For each case folder (e.g. ddMRI_new/1/):
@@ -11,12 +11,13 @@
 % 2026-01-06
 
 clear; clc;
+addpath(genpath(pwd))
 
 % ---- USER SETTINGS ----
-rootFolder  = '/data/gadgetron/matlab_study/dental_paper_all';
+rootFolder  = [pwd,'/Studies-deploy'];
 studiesFile = fullfile('./Studies-deploy', 'studies.m');
-numCases    = 17;
-caseList    = 3:17;   % subset if needed
+numCases    = 1;
+caseList    = 14;   % subset if needed
 
 % >>> NEW: sequence selection <<<
 % Leave EMPTY {} to reconstruct ALL sequences (default behaviour)
@@ -132,8 +133,16 @@ for caseIdx = caseList
              'rootFolder', 'studiesFile', 'numCases', 'caseList', ...
              'caseIdx', 'fIdx', 'currDir', ...
              'datFiles', 'caseFolder', 'seqSelect');
-
-
+         
+        %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% SENSE reconstruction 
+        % prepare the image for recon
+        % predict coil sensitivity map by ESPIRIT
+        % run SENSE and saved the image 
+        %       in $caseFolder/An-Aq
+        %       file name:
+        %       [erase(datFiles(fIdx).name,".dat"),'_Aq_womsk.nii']
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % ---- Run reconstruction ----
         try
             fprintf('Running deployRecon_dental...\n');
@@ -161,6 +170,117 @@ for caseIdx = caseList
         else
             warning('State file %s not found. Loop variables may be lost.', stateFile);
         end
+        
+        %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% Call python for preprocessing for segmentation
+        % the python script are within /Python sub-folder
+        % preprocessing to generate the cases for nnUNet segmentation
+        % the steps contains
+        %   crop and downsampling 
+        %       by ddMRI_cropds_recover.py and generate
+        %       '_Aq_womsk_cropds.nii.gz' image and a corresponding json
+        %       file
+        %       crop to FOV: "RL": 144.0, "AP": 160.0, "SI": 150.0
+        %       downsample to 2mm iso
+        %   after crop and downsample, norm the intenstiy to [0 1000] via
+        %   robust normalization by normalize_intensity_robust.py
+        %   and generate '_Aq_womsk_cropds_norm.nii.gz' (outputNii_norm)
+        %   which ready to be the testing case for nnUNet seg prediction
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % -------- Python preprocessing: crop + downsample --------
+        % Python info
+        PY_CROPDS = fullfile(currDir, 'Python', 'ddMRI_cropds_recover.py');
+        PY_NORM = fullfile(currDir, 'Python', 'normalize_intensity_robust.py');
+
+        % input files: SENSE reconed image
+        inputNii = fullfile(caseFolder, 'An-Aq', ...
+            [erase(datFiles(fIdx).name, '.dat'), '_Aq_womsk.nii']);
+
+        % output files
+        pathPrep = fullfile(caseFolder, 'An-Aq/seg'); if ~exist( pathPrep,'dir');mkdir(pathPrep);end
+        outputNii_cropds = fullfile(pathPrep, ...
+            [erase(datFiles(fIdx).name, '.dat'), '_Aq_womsk_cropds.nii.gz']);
+        outputNii_norm = fullfile(pathPrep, ...
+            [erase(datFiles(fIdx).name, '.dat'), '_Aq_womsk_cropds_norm.nii.gz']);
+
+        % --- Call python for crop and downsampling
+        CONDA = '/home/zn23/anaconda3/bin/conda';
+        ENVNAME = 'nnunetv2';
+
+        cmd = sprintf(['"%s" run -n %s python "%s" "%s" "%s" --mode generic'], ...
+            CONDA, ENVNAME, PY_CROPDS, inputNii, outputNii_cropds);
+        [status, cmdout] = system(cmd);
+        
+         % --- Call python for normalization
+        cmd = sprintf(['"%s" run -n %s python "%s" "%s" "%s" --plow 0.5 --phigh 99.5'], ...
+            CONDA, ENVNAME, PY_NORM, outputNii_cropds, outputNii_norm);
+        [status, cmdout] = system(cmd);
+
+        if status ~= 0
+            fprintf(2, 'Python preprocessing failed:\n%s\n', cmdout);
+            error('ddMRI_cropds_recover.py failed');
+        else
+            fprintf('Python preprocessing finished:\n%s\n', cmdout);
+        end
+
+        %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% Use nnUNet for segmentation prediction
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        % Input file: SENSE reconed image after preprocessing (cropds +
+        % norm)
+        inputNiiNorm = outputNii_norm;  
+
+        % nnUNet temp folders
+        nnUNetInDir  = fullfile(caseFolder, 'An-Aq', 'nnunet_in');
+        nnUNetOutDir = fullfile(caseFolder, 'An-Aq', 'nnunet_out');
+
+        if ~exist(nnUNetInDir, 'dir'), mkdir(nnUNetInDir); end
+        if ~exist(nnUNetOutDir, 'dir'), mkdir(nnUNetOutDir); end
+        
+        % nnUNet requires *_0000.nii.gz
+        nnUNetInputFile = fullfile(nnUNetInDir, 'ddMRI_001_0000.nii.gz');
+        copyfile(inputNiiNorm, nnUNetInputFile);
+        
+        % call trained network for segmentation
+        NNUNET_BASE = '/home/zn23/nnUNet';
+        
+        % segment of upper and lower teeth (trained network 2)
+        cmd = sprintf([ ...
+            '"%s" run -n %s ' ...
+            'bash -lc '' ' ...
+            'export nnUNet_raw="%s/nnUNet_raw"; ' ...
+            'export nnUNet_preprocessed="%s/nnUNet_preprocessed"; ' ...
+            'export nnUNet_results="%s/nnUNet_results"; ' ...
+            'nnUNetv2_predict ' ...
+            '-i "%s" -o "%s" ' ...
+            '-d 2 -c 3d_fullres -f 0 1 2 3 4 ' ...
+            ''''], ...
+            CONDA, ENVNAME, ...
+            NNUNET_BASE, NNUNET_BASE, NNUNET_BASE, ...
+            nnUNetInDir, nnUNetOutDir);
+        [status, cmdout] = system(cmd);
+
+        if status ~= 0
+            fprintf(2, 'nnUNet prediction failed:\n%s\n', cmdout);
+            error('nnUNetv2_predict failed');
+        else
+            fprintf('nnUNet prediction finished:\n%s\n', cmdout);
+        end
+        
+        % copy the result back and free temp
+        nnUNetOutputFile = fullfile(nnUNetOutDir, 'ddMRI_001.nii.gz');
+        nnUNetMaskteeth = fullfile(pathPrep, ...
+            [erase(datFiles(fIdx).name, '.dat'), '_msk_teeth.nii.gz']);
+        copyfile(nnUNetOutputFile, nnUNetMaskteeth);
+        rmdir(nnUNetInDir, 's'); 
+        rmdir(nnUNetOutDir, 's'); 
+
+
+
+
+        
 
     end % loop over dat files
 
