@@ -1,0 +1,7 @@
+ANTS/
+BART/
+FSL/
+**/*.dat
+**/*.nii
+**/*.mat
+

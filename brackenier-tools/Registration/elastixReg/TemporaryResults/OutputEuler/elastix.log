@@ -1,0 +1,685 @@
+
+elastix is started at Wed Aug 25 09:45:34 2021.
+
+which elastix:   /home/ybr19/Software/Elastix/elastix-4.9.0-linux/bin/elastix
+elastix runs at: gpubeastie05
+  Linux 5.4.0-80-generic (x64), #90~18.04.1-Ubuntu SMP Tue Jul 13 19:40:02 UTC 2021
+  with 257598 MB memory, and 20 cores @ 1000 MHz.
+-------------------------------------------------------------------------
+
+Running elastix with parameter file 0: "/home/ybr19/Software/Registration/elastixReg/TransformationParameters/parameters_single_euler.txt".
+
+Current time: Wed Aug 25 09:45:34 2021.
+Reading the elastix parameters from file ...
+
+Installing all components.
+InstallingComponents was successful.
+
+ELASTIX version: 4.900
+Command line options from ElastixBase:
+-f        /home/ybr19/Software/Registration/elastixReg/TemporaryResults/Input/imageFixed.nii
+-m        /home/ybr19/Software/Registration/elastixReg/TemporaryResults/Input/imageMoving.nii
+-fMask    unspecified, so no fixed mask used
+-mMask    unspecified, so no moving mask used
+-out      /home/ybr19/Software/Registration/elastixReg/TemporaryResults/OutputEuler/
+-p        /home/ybr19/Software/Registration/elastixReg/TransformationParameters/parameters_single_euler.txt
+-threads  unspecified, so all available threads are used
+Command line options from TransformBase:
+-t0       unspecified, so no initial transform used
+
+=============== start of ParameterFile: /home/ybr19/Software/Registration/elastixReg/TransformationParameters/parameters_single_euler.txt ===============
+(FixedInternalImagePixelType "float")  
+(MovingInternalImagePixelType "float")  
+(UseDirectionCosines "true")  
+(Registration "MultiResolutionRegistration")  
+(Interpolator "BSplineInterpolator")  
+(ResampleInterpolator "FinalBSplineInterpolator")  
+(Resampler "DefaultResampler")  
+(FixedImagePyramid "FixedRecursiveImagePyramid")  
+(MovingImagePyramid "MovingRecursiveImagePyramid") 
+(Optimizer "AdaptiveStochasticGradientDescent")  
+(Transform "EulerTransform")  
+(Metric "AdvancedMattesMutualInformation" ) 
+(NumberOfHistogramBins 32) 
+(AutomaticScalesEstimation "true")  
+(HowToCombineTransforms "Compose") 
+(ErodeMask "true")  
+(NumberOfResolutions 3)  
+(MaximumNumberOfIterations 100) 
+(MaximumStepLength 1)  
+(NumberOfSpatialSamples 7000) 
+(NewSamplesEveryIteration "true") 
+(ImageSampler "Random") 
+(BSplineInterpolationOrder "1") 
+(FinalBSplineInterpolationOrder "3") 
+(DefaultPixelValue 0)  
+(WriteResultImage "false") 
+(ResultImagePixelType "float") 
+(ResultImageFormat "nii")  
+(ShowExactMetricValue "true" "true") 
+
+
+=============== end of ParameterFile: /home/ybr19/Software/Registration/elastixReg/TransformationParameters/parameters_single_euler.txt ===============
+
+
+Reading images...
+Reading images took 55 ms.
+
+WARNING: the fixed pyramid schedule is not fully specified!
+  A default pyramid schedule is used.
+WARNING: the moving pyramid schedule is not fully specified!
+  A default pyramid schedule is used.
+WARNING: The parameter "AutomaticTransformInitialization", requested at entry number 0, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "AutomaticTransformInitializationMethod", requested at entry number 0, does not exist at all.
+  The default value "GeometricalCenter" is used instead.
+Transform parameters are initialized as: [0, 0, 0, 0, 0, 0]
+Scales are estimated automatically.
+Scales for transform parameters are: [11320.63777903862, 8711.155163523059, 10588.152100980951, 1, 1, 1]
+Initialization of all components (before registration) took: 3 ms.
+Preparation of the image pyramids took: 369 ms.
+
+Resolution: 0
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 0, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 1, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 2, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricEveryXIterations", requested at entry number 0, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "CheckNumberOfSamples", requested at entry number 0, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseMultiThreadingForMetrics", requested at entry number 0, does not exist at all.
+  The default value "true" is used instead.
+Setting the fixed masks took: 0 ms.
+Setting the moving masks took: 0 ms.
+WARNING: The parameter "NumberOfFixedHistogramBins", requested at entry number 0, does not exist at all.
+  The default value "32" is used instead.
+WARNING: The parameter "NumberOfMovingHistogramBins", requested at entry number 0, does not exist at all.
+  The default value "32" is used instead.
+WARNING: The parameter "FixedLimitRangeRatio", requested at entry number 0, does not exist at all.
+  The default value "0.01" is used instead.
+WARNING: The parameter "MovingLimitRangeRatio", requested at entry number 0, does not exist at all.
+  The default value "0.01" is used instead.
+WARNING: The parameter "FixedKernelBSplineOrder", requested at entry number 0, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "MovingKernelBSplineOrder", requested at entry number 0, does not exist at all.
+  The default value "3" is used instead.
+WARNING: The parameter "UseFastAndLowMemoryVersion", requested at entry number 0, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseJacobianPreconditioning", requested at entry number 0, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "FiniteDifferenceDerivative", requested at entry number 0, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "SP_A", requested at entry number 0, does not exist at all.
+  The default value "20" is used instead.
+WARNING: The parameter "MaximumNumberOfSamplingAttempts", requested at entry number 0, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "SigmoidInitialTime", requested at entry number 0, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "MaxBandCovSize", requested at entry number 0, does not exist at all.
+  The default value "192" is used instead.
+WARNING: The parameter "NumberOfBandStructureSamples", requested at entry number 0, does not exist at all.
+  The default value "10" is used instead.
+WARNING: The parameter "UseAdaptiveStepSizes", requested at entry number 0, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "AutomaticParameterEstimation", requested at entry number 0, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseConstantStep", requested at entry number 0, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "NumberOfGradientMeasurements", requested at entry number 0, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "NumberOfJacobianMeasurements", requested at entry number 0, does not exist at all.
+  The default value "1000" is used instead.
+WARNING: The parameter "NumberOfSamplesForExactGradient", requested at entry number 0, does not exist at all.
+  The default value "100000" is used instead.
+WARNING: The parameter "SigmoidScaleFactor", requested at entry number 0, does not exist at all.
+  The default value "0.1" is used instead.
+Elastix initialization of all components (for this resolution) took: 13 ms.
+Initialization of AdvancedMattesMutualInformation metric took: 2 ms.
+Starting automatic parameter estimation for AdaptiveStochasticGradientDescent ...
+WARNING: The parameter "ASGDParameterEstimationMethod", requested at entry number 0, does not exist at all.
+  The default value "Original" is used instead.
+  Computing JacobianTerms ...
+  Computing the Jacobian terms took 0.000720s
+  NumberOfGradientMeasurements to estimate sigma_i: 6
+  Sampling gradients ...
+  Sampling the gradients took 0.156005s
+Automatic parameter estimation took 0.17s
+1:ItNr	2:Metric	3a:Time	3b:StepSize	4:||Gradient||	ExactMetric0	Time[ms]
+0	-1.203831	0.000000	9.946340	0.036386	-1.202008	225.3
+1	-1.223512	0.000000	9.946340	0.026550	-1.207856	17.2
+2	-1.218817	0.000000	9.946340	0.016242	-1.209405	18.8
+3	-1.217911	0.000000	9.946340	0.011263	-1.210007	18.8
+4	-1.230532	0.000000	9.946340	0.004135	-1.210135	17.5
+5	-1.211478	0.999999	9.494234	0.006220	-1.210136	18.1
+6	-1.204273	0.978715	9.503429	0.009390	-1.210059	18.8
+7	-1.214250	1.978715	9.089853	0.012635	-1.210210	18.3
+8	-1.211867	2.978715	8.710773	0.006401	-1.210375	18.7
+9	-1.215587	3.978715	8.362045	0.005758	-1.210362	18.2
+10	-1.192515	3.959232	8.368573	0.003955	-1.210387	17.8
+11	-1.212754	4.959232	8.046199	0.003726	-1.210337	18.1
+12	-1.210503	4.939695	8.052259	0.005202	-1.210410	18.0
+13	-1.223920	5.939694	7.753360	0.004197	-1.210386	18.5
+14	-1.236599	5.918410	7.759491	0.004941	-1.210340	17.9
+15	-1.223717	5.919931	7.759052	0.004072	-1.210384	17.4
+16	-1.210918	6.469574	7.603800	0.005815	-1.210298	18.9
+17	-1.210537	6.448290	7.609696	0.011008	-1.210320	18.8
+18	-1.213355	7.448290	7.342204	0.006287	-1.210350	19.1
+19	-1.233249	8.448290	7.092879	0.008576	-1.210330	19.5
+20	-1.217307	9.446890	6.860246	0.006446	-1.210392	18.3
+21	-1.232767	10.446814	6.642108	0.006894	-1.210391	17.3
+22	-1.201543	11.446814	6.437401	0.002758	-1.210364	18.1
+23	-1.191832	11.425542	6.441624	0.006477	-1.210399	18.3
+24	-1.220428	12.295752	6.273267	0.005859	-1.210391	18.4
+25	-1.221097	12.277429	6.276721	0.004405	-1.210431	18.7
+26	-1.223934	13.277429	6.093606	0.004424	-1.210389	18.2
+27	-1.202528	14.232408	5.928438	0.003349	-1.210397	17.6
+28	-1.205159	14.357584	5.907450	0.003826	-1.210435	18.3
+29	-1.223119	14.337274	5.910845	0.003646	-1.210398	19.3
+30	-1.213089	15.337252	5.748182	0.005930	-1.210332	18.9
+31	-1.175888	15.315968	5.751551	0.007073	-1.210356	19.3
+32	-1.233673	16.315959	5.597421	0.004999	-1.210372	18.8
+33	-1.215013	17.315950	5.451337	0.009353	-1.210374	18.1
+34	-1.228848	18.315949	5.312682	0.006404	-1.210429	17.9
+35	-1.229530	19.315949	5.180906	0.003952	-1.210436	18.2
+36	-1.206716	19.294987	5.183601	0.007947	-1.210383	18.5
+37	-1.215046	20.294987	5.058075	0.005357	-1.210405	18.6
+38	-1.209238	21.294984	4.938485	0.005167	-1.210348	18.4
+39	-1.214027	21.273767	4.940964	0.010666	-1.210358	19.5
+40	-1.214033	22.273767	4.826785	0.003131	-1.210305	13.7
+41	-1.195275	22.252482	4.829160	0.010321	-1.210400	13.1
+42	-1.193488	23.252482	4.720032	0.003942	-1.210420	15.4
+43	-1.215966	24.249090	4.616074	0.003262	-1.210416	14.1
+44	-1.229371	25.244186	4.516744	0.001948	-1.210423	15.0
+45	-1.205925	25.309981	4.510327	0.004881	-1.210422	13.6
+46	-1.217012	25.288850	4.512386	0.002718	-1.210418	14.0
+47	-1.230413	26.279675	4.417821	0.006014	-1.210373	14.9
+48	-1.230970	26.270482	4.418680	0.004946	-1.210288	13.5
+49	-1.186315	26.249197	4.420671	0.007575	-1.210384	14.8
+50	-1.183299	27.249197	4.329049	0.006499	-1.210421	14.9
+51	-1.220646	27.227913	4.330960	0.005055	-1.210424	16.7
+52	-1.213710	28.086268	4.255226	0.004688	-1.210416	13.6
+53	-1.205744	29.086268	4.170268	0.010772	-1.210367	16.7
+54	-1.221560	30.086260	4.088637	0.006576	-1.210432	12.3
+55	-1.225984	31.086260	4.010139	0.003071	-1.210442	13.6
+56	-1.221166	31.073215	4.011144	0.005037	-1.210427	15.3
+57	-1.195122	31.052055	4.012774	0.007217	-1.210426	13.8
+58	-1.219145	32.052055	3.937136	0.006223	-1.210440	15.7
+59	-1.238435	33.052055	3.864296	0.005849	-1.210421	13.9
+60	-1.209539	34.052055	3.794103	0.005347	-1.210370	16.3
+61	-1.225604	34.030770	3.795570	0.004222	-1.210405	19.9
+62	-1.213850	34.982624	3.731035	0.005850	-1.210434	12.9
+63	-1.248374	34.961339	3.732454	0.007539	-1.210387	15.7
+64	-1.191261	35.961339	3.666928	0.004902	-1.210416	13.6
+65	-1.210629	36.961339	3.603663	0.006681	-1.210424	15.3
+66	-1.206766	36.949493	3.604400	0.005097	-1.210392	14.7
+67	-1.227435	36.928208	3.605724	0.005216	-1.210424	17.0
+68	-1.203836	37.928208	3.544536	0.003519	-1.210427	13.4
+69	-1.218803	38.523772	3.509071	0.005820	-1.210406	18.2
+70	-1.212460	38.506732	3.510076	0.003955	-1.210396	18.7
+71	-1.216578	39.503697	3.452238	0.005548	-1.210428	12.8
+72	-1.184335	40.472259	3.397844	0.005737	-1.210406	15.2
+73	-1.218221	41.472259	3.343454	0.003656	-1.210391	18.7
+74	-1.208455	41.450975	3.344594	0.003964	-1.210381	14.1
+75	-1.228693	41.432117	3.345604	0.004516	-1.210364	13.5
+76	-1.222391	41.410838	3.346745	0.007843	-1.210416	15.4
+77	-1.207559	41.389553	3.347887	0.007778	-1.210400	13.5
+78	-1.223525	41.368269	3.349029	0.005503	-1.210425	20.3
+79	-1.204454	42.368269	3.296179	0.003608	-1.210405	18.6
+80	-1.190716	43.257716	3.250554	0.005040	-1.210394	13.0
+81	-1.210734	43.285216	3.249163	0.006367	-1.210367	19.8
+82	-1.229965	43.263931	3.250239	0.009493	-1.210434	13.9
+83	-1.215477	44.263931	3.200438	0.005092	-1.210441	13.5
+84	-1.210658	44.242647	3.201482	0.006824	-1.210439	15.0
+85	-1.220661	45.242646	3.153152	0.002275	-1.210433	16.0
+86	-1.218754	45.221361	3.154166	0.005054	-1.210441	14.1
+87	-1.208171	46.065730	3.114454	0.006319	-1.210431	14.3
+88	-1.216463	47.065730	3.068698	0.009755	-1.210426	13.5
+89	-1.201613	48.065730	3.024266	0.005810	-1.210443	16.0
+90	-1.208940	49.065730	2.981103	0.007585	-1.210416	14.2
+91	-1.229796	50.065730	2.939154	0.003887	-1.210439	14.6
+92	-1.200449	51.065730	2.898370	0.004098	-1.210432	14.1
+93	-1.214831	51.044526	2.899223	0.006213	-1.210442	14.8
+94	-1.212558	52.044526	2.859532	0.006441	-1.210425	14.8
+95	-1.213134	52.023242	2.860365	0.007191	-1.210431	16.3
+96	-1.209844	53.023240	2.821724	0.003024	-1.210428	13.5
+97	-1.208580	53.872897	2.789703	0.004839	-1.210426	14.1
+98	-1.249238	53.851749	2.790491	0.003545	-1.210425	20.0
+99	-1.201621	54.851563	2.753709	0.004265	-1.210434	18.5
+Time spent in resolution 0 (ITK initialization and iterating): 1.858 s.
+Stopping condition: Maximum number of iterations has been reached.
+Settings of AdaptiveStochasticGradientDescent in resolution 0:
+( SP_a 208.873148 )
+( SP_A 20.000000 )
+( SP_alpha 1.000000 )
+( SigmoidMax 1.000000 )
+( SigmoidMin -0.021285 )
+( SigmoidScale 0.000001 )
+
+
+Resolution: 1
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 3, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 4, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 5, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricEveryXIterations", requested at entry number 1, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "CheckNumberOfSamples", requested at entry number 1, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseMultiThreadingForMetrics", requested at entry number 1, does not exist at all.
+  The default value "true" is used instead.
+Setting the fixed masks took: 0 ms.
+Setting the moving masks took: 0 ms.
+WARNING: The parameter "NumberOfFixedHistogramBins", requested at entry number 1, does not exist at all.
+  The default value "32" is used instead.
+WARNING: The parameter "NumberOfMovingHistogramBins", requested at entry number 1, does not exist at all.
+  The default value "32" is used instead.
+WARNING: The parameter "FixedLimitRangeRatio", requested at entry number 1, does not exist at all.
+  The default value "0.01" is used instead.
+WARNING: The parameter "MovingLimitRangeRatio", requested at entry number 1, does not exist at all.
+  The default value "0.01" is used instead.
+WARNING: The parameter "FixedKernelBSplineOrder", requested at entry number 1, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "MovingKernelBSplineOrder", requested at entry number 1, does not exist at all.
+  The default value "3" is used instead.
+WARNING: The parameter "UseFastAndLowMemoryVersion", requested at entry number 1, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseJacobianPreconditioning", requested at entry number 1, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "FiniteDifferenceDerivative", requested at entry number 1, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "SP_A", requested at entry number 1, does not exist at all.
+  The default value "20" is used instead.
+WARNING: The parameter "MaximumNumberOfSamplingAttempts", requested at entry number 1, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "SigmoidInitialTime", requested at entry number 1, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "MaxBandCovSize", requested at entry number 1, does not exist at all.
+  The default value "192" is used instead.
+WARNING: The parameter "NumberOfBandStructureSamples", requested at entry number 1, does not exist at all.
+  The default value "10" is used instead.
+WARNING: The parameter "UseAdaptiveStepSizes", requested at entry number 1, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "AutomaticParameterEstimation", requested at entry number 1, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseConstantStep", requested at entry number 1, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "NumberOfGradientMeasurements", requested at entry number 1, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "NumberOfJacobianMeasurements", requested at entry number 1, does not exist at all.
+  The default value "1000" is used instead.
+WARNING: The parameter "NumberOfSamplesForExactGradient", requested at entry number 1, does not exist at all.
+  The default value "100000" is used instead.
+WARNING: The parameter "SigmoidScaleFactor", requested at entry number 1, does not exist at all.
+  The default value "0.1" is used instead.
+Elastix initialization of all components (for this resolution) took: 36 ms.
+Initialization of AdvancedMattesMutualInformation metric took: 12 ms.
+Starting automatic parameter estimation for AdaptiveStochasticGradientDescent ...
+WARNING: The parameter "ASGDParameterEstimationMethod", requested at entry number 0, does not exist at all.
+  The default value "Original" is used instead.
+  Computing JacobianTerms ...
+  Computing the Jacobian terms took 0.000785s
+  NumberOfGradientMeasurements to estimate sigma_i: 6
+  Sampling gradients ...
+  Sampling the gradients took 0.167612s
+Automatic parameter estimation took 0.18s
+1:ItNr	2:Metric	3a:Time	3b:StepSize	4:||Gradient||	ExactMetric0	Time[ms]
+0	-0.960668	0.000000	12.990743	0.011591	-0.961746	265.0
+1	-0.976345	0.000000	12.990743	0.013788	-0.961862	34.0
+2	-0.962951	0.999999	12.400255	0.020551	-0.960589	35.0
+3	-0.972193	1.999999	11.861113	0.025379	-0.960424	40.0
+4	-0.972694	2.999999	11.366900	0.023869	-0.961404	33.9
+5	-0.973007	3.999999	10.912224	0.018463	-0.961343	25.5
+6	-0.960824	4.999999	10.492523	0.013821	-0.962277	25.7
+7	-0.972550	5.999999	10.103911	0.018861	-0.960608	33.3
+8	-0.943328	6.999999	9.743057	0.016950	-0.962314	36.0
+9	-0.955627	7.999999	9.407090	0.007244	-0.962380	32.1
+10	-0.952247	8.999999	9.093520	0.017207	-0.961539	34.6
+11	-0.958610	9.999999	8.800181	0.020603	-0.962269	39.0
+12	-0.971624	10.999999	8.525175	0.015888	-0.962071	33.5
+13	-0.970381	11.999999	8.266836	0.010436	-0.962661	21.5
+14	-0.950479	12.999999	8.023694	0.007431	-0.962489	28.4
+15	-0.970701	12.997759	8.024223	0.009029	-0.962640	30.8
+16	-0.976427	13.997745	7.794948	0.009402	-0.962656	37.6
+17	-0.976216	14.997745	7.578408	0.008633	-0.962661	34.1
+18	-0.975859	15.989771	7.375163	0.014090	-0.962024	33.8
+19	-0.972337	16.989771	7.181028	0.010639	-0.962575	35.1
+20	-0.980344	17.989771	6.996850	0.015236	-0.961857	32.2
+21	-0.972111	18.989771	6.821884	0.017349	-0.962573	35.3
+22	-0.975864	19.989771	6.655456	0.007961	-0.962704	40.0
+23	-0.959005	20.989771	6.496954	0.007771	-0.962548	32.0
+24	-0.972256	21.989771	6.345826	0.010997	-0.962664	29.1
+25	-0.974809	22.989764	6.201570	0.012279	-0.962341	22.6
+26	-0.961491	23.989764	6.063726	0.016498	-0.962242	31.3
+27	-0.952082	24.989764	5.931876	0.008139	-0.962544	34.4
+28	-0.960675	25.989764	5.805639	0.003126	-0.962533	36.5
+29	-0.972190	25.909523	5.815570	0.011055	-0.962485	31.1
+30	-0.953633	26.054183	5.797691	0.009744	-0.962531	34.8
+31	-0.968258	27.054183	5.677042	0.006196	-0.962481	28.7
+32	-0.977653	28.054041	5.561328	0.005945	-0.962467	30.9
+33	-0.968646	27.973198	5.570508	0.006114	-0.962539	25.1
+34	-0.957633	28.971931	5.459177	0.011082	-0.962450	29.8
+35	-0.980821	29.835120	5.366479	0.005363	-0.962359	34.4
+36	-0.984119	29.769930	5.373370	0.008514	-0.962494	42.8
+37	-0.979010	30.667233	5.280050	0.011400	-0.962400	38.1
+38	-0.994573	31.667233	5.179797	0.007939	-0.962577	35.1
+39	-0.972099	32.663448	5.083639	0.005330	-0.962465	34.6
+40	-0.970614	33.663034	4.990678	0.007074	-0.962459	34.1
+41	-0.975300	34.586175	4.907796	0.007291	-0.962552	36.4
+42	-0.969984	35.560900	4.823219	0.005303	-0.962427	35.0
+43	-0.981500	36.521375	4.742682	0.006634	-0.962436	31.9
+44	-0.973085	37.373503	4.673449	0.006961	-0.962417	30.7
+45	-0.968743	37.579294	4.657031	0.011164	-0.962383	34.0
+46	-0.969559	38.376743	4.594486	0.008458	-0.962510	41.6
+47	-0.984112	39.374537	4.518554	0.011318	-0.962214	31.5
+48	-0.996425	40.374537	4.444931	0.011189	-0.962275	33.5
+49	-0.957665	41.374465	4.373674	0.004947	-0.962207	37.6
+50	-0.951034	41.292536	4.379427	0.008499	-0.962223	34.4
+51	-0.954695	41.739087	4.348256	0.009768	-0.962266	36.3
+52	-0.973152	42.739087	4.280036	0.006313	-0.962332	34.7
+53	-0.959322	43.739087	4.213924	0.005803	-0.962325	36.6
+54	-0.975826	43.657083	4.219269	0.002888	-0.962325	29.3
+55	-0.961079	44.425297	4.169727	0.002890	-0.962364	29.8
+56	-0.956544	44.707162	4.151840	0.007733	-0.962412	32.8
+57	-0.969433	44.641920	4.155966	0.011467	-0.962507	34.4
+58	-0.982428	44.900455	4.139662	0.005019	-0.962540	31.5
+59	-0.953083	45.899659	4.077832	0.009971	-0.962584	37.8
+60	-0.969483	46.898145	4.017865	0.011615	-0.962317	32.1
+61	-0.953710	46.816610	4.022696	0.010154	-0.962560	32.3
+62	-0.974237	47.816610	3.964241	0.005075	-0.962616	34.1
+63	-0.989762	47.734601	3.968970	0.005767	-0.962640	32.9
+64	-0.978624	48.204138	3.942042	0.009017	-0.962605	38.2
+65	-0.959076	48.122155	3.946717	0.009370	-0.962559	23.8
+66	-0.977398	48.155174	3.944833	0.008475	-0.962607	32.6
+67	-0.963168	49.155172	3.888603	0.009511	-0.962508	39.8
+68	-0.952852	49.073164	3.893154	0.011772	-0.962495	34.7
+69	-0.970711	50.073164	3.838377	0.007058	-0.962407	39.2
+70	-0.962743	50.863740	3.796151	0.004124	-0.962398	36.9
+71	-0.952610	51.759532	3.749414	0.006457	-0.962487	31.6
+72	-0.966359	52.524752	3.710391	0.008220	-0.962508	34.4
+73	-0.974243	52.442744	3.714534	0.006224	-0.962491	28.3
+74	-0.951401	52.362706	3.718587	0.005698	-0.962524	25.4
+75	-0.978059	53.267123	3.673302	0.009120	-0.962476	33.5
+76	-0.981640	54.267122	3.624499	0.004160	-0.962520	34.0
+77	-0.965537	55.266933	3.576984	0.006213	-0.962553	34.3
+78	-0.954734	55.490741	3.566518	0.002985	-0.962533	32.4
+79	-0.952784	55.445895	3.568610	0.004865	-0.962529	34.2
+80	-0.977718	55.382712	3.571562	0.010023	-0.962604	30.8
+81	-0.969551	56.380588	3.525504	0.005113	-0.962604	31.8
+82	-0.956345	57.380204	3.480542	0.008122	-0.962580	37.6
+83	-0.974933	58.269691	3.441487	0.007976	-0.962631	30.9
+84	-0.972915	59.251802	3.399370	0.007307	-0.962520	32.5
+85	-0.975742	60.251718	3.357536	0.006641	-0.962542	35.8
+86	-0.950854	60.459942	3.348954	0.008963	-0.962367	38.1
+87	-0.972046	60.416142	3.350756	0.010106	-0.962370	38.0
+88	-0.975426	61.415981	3.310106	0.006268	-0.962234	35.2
+89	-0.973471	61.343823	3.313006	0.008417	-0.962384	33.0
+90	-0.976902	62.343756	3.273258	0.008248	-0.962430	36.6
+91	-0.980497	62.261752	3.276482	0.004416	-0.962368	38.9
+92	-0.948298	62.282428	3.275668	0.008957	-0.962397	25.5
+93	-0.967606	63.281125	3.236853	0.005445	-0.962400	35.3
+94	-0.971976	63.199120	3.240005	0.004933	-0.962366	37.1
+95	-0.964902	64.188005	3.202394	0.007495	-0.962456	37.2
+96	-0.936671	65.183959	3.165387	0.006480	-0.962381	38.5
+97	-0.976618	66.183119	3.129110	0.005668	-0.962444	34.6
+98	-0.967677	66.464695	3.119037	0.010648	-0.962503	34.9
+99	-0.969990	66.390707	3.121677	0.007002	-0.962551	35.9
+Time spent in resolution 1 (ITK initialization and iterating): 3.604 s.
+Stopping condition: Maximum number of iterations has been reached.
+Settings of AdaptiveStochasticGradientDescent in resolution 1:
+( SP_a 272.805596 )
+( SP_A 20.000000 )
+( SP_alpha 1.000000 )
+( SigmoidMax 1.000000 )
+( SigmoidMin -0.082008 )
+( SigmoidScale 0.000003 )
+
+
+Resolution: 2
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 6, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 7, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricSampleGridSpacing", requested at entry number 8, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "ExactMetricEveryXIterations", requested at entry number 2, does not exist at all.
+  The default value "1" is used instead.
+WARNING: The parameter "CheckNumberOfSamples", requested at entry number 2, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseMultiThreadingForMetrics", requested at entry number 2, does not exist at all.
+  The default value "true" is used instead.
+Setting the fixed masks took: 0 ms.
+Setting the moving masks took: 0 ms.
+WARNING: The parameter "NumberOfFixedHistogramBins", requested at entry number 2, does not exist at all.
+  The default value "32" is used instead.
+WARNING: The parameter "NumberOfMovingHistogramBins", requested at entry number 2, does not exist at all.
+  The default value "32" is used instead.
+WARNING: The parameter "FixedLimitRangeRatio", requested at entry number 2, does not exist at all.
+  The default value "0.01" is used instead.
+WARNING: The parameter "MovingLimitRangeRatio", requested at entry number 2, does not exist at all.
+  The default value "0.01" is used instead.
+WARNING: The parameter "FixedKernelBSplineOrder", requested at entry number 2, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "MovingKernelBSplineOrder", requested at entry number 2, does not exist at all.
+  The default value "3" is used instead.
+WARNING: The parameter "UseFastAndLowMemoryVersion", requested at entry number 2, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseJacobianPreconditioning", requested at entry number 2, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "FiniteDifferenceDerivative", requested at entry number 2, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "SP_A", requested at entry number 2, does not exist at all.
+  The default value "20" is used instead.
+WARNING: The parameter "MaximumNumberOfSamplingAttempts", requested at entry number 2, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "SigmoidInitialTime", requested at entry number 2, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "MaxBandCovSize", requested at entry number 2, does not exist at all.
+  The default value "192" is used instead.
+WARNING: The parameter "NumberOfBandStructureSamples", requested at entry number 2, does not exist at all.
+  The default value "10" is used instead.
+WARNING: The parameter "UseAdaptiveStepSizes", requested at entry number 2, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "AutomaticParameterEstimation", requested at entry number 2, does not exist at all.
+  The default value "true" is used instead.
+WARNING: The parameter "UseConstantStep", requested at entry number 2, does not exist at all.
+  The default value "false" is used instead.
+WARNING: The parameter "NumberOfGradientMeasurements", requested at entry number 2, does not exist at all.
+  The default value "0" is used instead.
+WARNING: The parameter "NumberOfJacobianMeasurements", requested at entry number 2, does not exist at all.
+  The default value "1000" is used instead.
+WARNING: The parameter "NumberOfSamplesForExactGradient", requested at entry number 2, does not exist at all.
+  The default value "100000" is used instead.
+WARNING: The parameter "SigmoidScaleFactor", requested at entry number 2, does not exist at all.
+  The default value "0.1" is used instead.
+Elastix initialization of all components (for this resolution) took: 33 ms.
+Initialization of AdvancedMattesMutualInformation metric took: 110 ms.
+Starting automatic parameter estimation for AdaptiveStochasticGradientDescent ...
+WARNING: The parameter "ASGDParameterEstimationMethod", requested at entry number 0, does not exist at all.
+  The default value "Original" is used instead.
+  Computing JacobianTerms ...
+  Computing the Jacobian terms took 0.000670s
+  NumberOfGradientMeasurements to estimate sigma_i: 6
+  Sampling gradients ...
+  Sampling the gradients took 0.230546s
+Automatic parameter estimation took 0.24s
+1:ItNr	2:Metric	3a:Time	3b:StepSize	4:||Gradient||	ExactMetric0	Time[ms]
+0	-0.691098	0.000000	10.947557	0.009272	-0.702620	612.3
+1	-0.688575	0.000000	10.947557	0.013448	-0.701787	103.1
+2	-0.715631	0.412063	10.736878	0.021905	-0.701118	92.9
+3	-0.681799	1.412063	10.257811	0.021993	-0.702224	91.5
+4	-0.701644	2.412063	9.819669	0.021224	-0.702299	94.9
+5	-0.700668	3.412063	9.417422	0.027729	-0.700632	81.9
+6	-0.711008	4.412063	9.046834	0.040491	-0.699613	83.6
+7	-0.695718	5.412063	8.704307	0.040593	-0.700859	94.7
+8	-0.698563	6.412063	8.386771	0.014214	-0.702584	90.1
+9	-0.705483	7.412063	8.091588	0.009301	-0.702333	95.3
+10	-0.703903	8.180880	7.878402	0.007964	-0.702841	91.6
+11	-0.708235	9.150578	7.625018	0.008690	-0.702390	92.3
+12	-0.720189	9.162263	7.622064	0.014196	-0.701879	95.6
+13	-0.712523	10.162219	7.377482	0.014573	-0.702867	85.0
+14	-0.701056	11.162219	7.148098	0.019498	-0.702392	91.2
+15	-0.696261	11.080022	7.166414	0.016059	-0.702682	92.1
+16	-0.697931	12.080022	6.949775	0.010197	-0.702965	121.3
+17	-0.716027	13.080022	6.745850	0.012061	-0.702992	92.8
+18	-0.708361	12.998618	6.762001	0.013320	-0.702859	115.1
+19	-0.729342	13.998618	6.568794	0.033456	-0.701160	92.9
+20	-0.699933	14.998618	6.386320	0.012648	-0.702183	107.1
+21	-0.698091	15.998618	6.213711	0.014053	-0.702376	98.4
+22	-0.703711	16.978286	6.053425	0.019475	-0.702546	123.9
+23	-0.727776	17.978286	5.898122	0.014241	-0.703075	97.1
+24	-0.694592	18.978286	5.750589	0.020591	-0.701859	104.6
+25	-0.695188	19.978286	5.610257	0.027978	-0.702401	109.1
+26	-0.719486	20.978286	5.476610	0.022926	-0.702411	96.9
+27	-0.699537	21.978286	5.349183	0.014965	-0.702433	114.2
+28	-0.716132	22.978286	5.227550	0.021117	-0.702455	110.0
+29	-0.709799	22.896101	5.237338	0.022820	-0.703061	95.4
+30	-0.722858	23.896101	5.120683	0.014386	-0.702995	107.9
+31	-0.724600	24.896101	5.009112	0.021578	-0.702333	114.9
+32	-0.702908	25.895806	4.902330	0.018967	-0.703023	130.9
+33	-0.703729	26.895806	4.799976	0.012781	-0.702986	105.4
+34	-0.690449	26.854506	4.804118	0.021429	-0.702803	95.5
+35	-0.727040	27.854506	4.705783	0.011021	-0.702972	84.0
+36	-0.709228	28.854506	4.611393	0.011906	-0.702926	100.5
+37	-0.705207	28.772309	4.619008	0.013590	-0.702951	99.4
+38	-0.685127	29.772309	4.528033	0.010520	-0.703021	101.4
+39	-0.727294	30.771285	4.440661	0.007223	-0.703034	91.8
+40	-0.704557	30.689094	4.447722	0.007102	-0.702926	90.2
+41	-0.722201	30.781992	4.439742	0.012953	-0.703066	90.8
+42	-0.700372	31.781991	4.355628	0.006080	-0.703082	118.1
+43	-0.728066	31.699822	4.362419	0.007819	-0.702953	94.7
+44	-0.718094	31.622320	4.368844	0.008950	-0.703016	90.5
+45	-0.693320	32.622011	4.287394	0.007383	-0.703006	91.7
+46	-0.705704	32.539910	4.293969	0.023497	-0.702683	89.4
+47	-0.711001	32.457896	4.300557	0.009130	-0.702722	94.0
+48	-0.714892	33.457894	4.221586	0.014507	-0.702955	100.1
+49	-0.703333	33.378758	4.227730	0.012669	-0.702633	101.5
+50	-0.692822	34.378758	4.151388	0.009086	-0.702937	102.1
+51	-0.709004	35.378758	4.077754	0.016227	-0.702678	91.7
+52	-0.697024	35.296561	4.083708	0.012494	-0.702835	90.1
+53	-0.696166	36.296561	4.012435	0.019241	-0.702344	106.8
+54	-0.703209	37.296530	3.943609	0.014268	-0.702842	110.8
+55	-0.692530	38.296530	3.877102	0.014374	-0.703034	95.7
+56	-0.706716	38.214333	3.882484	0.012904	-0.702844	92.2
+57	-0.703930	38.132168	3.887879	0.007361	-0.702893	104.6
+58	-0.717777	39.132166	3.823223	0.010561	-0.702922	106.0
+59	-0.697181	39.049970	3.828457	0.009933	-0.702728	100.3
+60	-0.723184	38.967773	3.833704	0.022111	-0.702735	92.1
+61	-0.700738	39.967773	3.770823	0.010690	-0.702829	106.9
+62	-0.713874	40.967762	3.709973	0.017034	-0.702889	95.9
+63	-0.691563	41.967753	3.651055	0.013112	-0.702670	105.4
+64	-0.711542	41.885556	3.655827	0.014124	-0.702849	100.8
+65	-0.716515	41.803531	3.660602	0.015222	-0.703101	99.4
+66	-0.706324	42.802886	3.603265	0.010324	-0.702951	101.0
+67	-0.719123	42.721123	3.607888	0.014263	-0.702798	100.1
+68	-0.716220	42.719099	3.608003	0.011220	-0.702392	108.9
+69	-0.688881	42.636902	3.612663	0.019017	-0.702914	102.9
+70	-0.728921	43.636902	3.556772	0.013120	-0.703024	90.5
+71	-0.722668	43.554742	3.561298	0.014008	-0.702884	90.0
+72	-0.694215	43.595664	3.559042	0.013754	-0.702799	99.6
+73	-0.708997	43.514565	3.563516	0.018495	-0.702965	99.4
+74	-0.708915	44.514565	3.509124	0.016791	-0.702819	97.3
+75	-0.697147	45.514565	3.456366	0.010349	-0.702979	92.8
+76	-0.702611	46.514565	3.405172	0.008087	-0.702977	118.9
+77	-0.718733	46.580396	3.401855	0.009998	-0.703028	124.0
+78	-0.706255	47.550549	3.353711	0.006905	-0.703058	92.7
+79	-0.718205	47.468360	3.357736	0.005274	-0.703006	94.5
+80	-0.731438	48.395564	3.312873	0.013540	-0.702827	104.8
+81	-0.689556	48.468920	3.309375	0.016854	-0.702485	91.6
+82	-0.693343	48.386722	3.313295	0.015161	-0.702721	94.2
+83	-0.714812	49.386722	3.266223	0.020357	-0.702757	103.5
+84	-0.728626	49.304525	3.270041	0.022371	-0.703047	104.3
+85	-0.704806	50.304525	3.224181	0.014106	-0.702871	91.5
+86	-0.719244	51.304525	3.179589	0.004278	-0.702842	90.2
+87	-0.702030	51.223326	3.183164	0.010652	-0.702766	91.0
+88	-0.714559	51.213633	3.183591	0.011960	-0.702737	91.3
+89	-0.720400	52.213627	3.140108	0.013135	-0.702645	92.0
+90	-0.720700	53.213627	3.097796	0.016259	-0.702691	126.7
+91	-0.724731	54.213627	3.056610	0.014499	-0.702774	92.5
+92	-0.685459	55.213627	3.016504	0.014696	-0.702688	96.5
+93	-0.699214	56.213627	2.977437	0.012341	-0.702949	101.8
+94	-0.714199	57.213627	2.939369	0.003811	-0.702965	94.7
+95	-0.707002	57.174739	2.940831	0.006141	-0.702866	85.2
+96	-0.740149	57.544280	2.926995	0.009192	-0.702922	109.5
+97	-0.697458	58.055729	2.908059	0.013755	-0.703064	91.3
+98	-0.706473	57.973553	2.911085	0.014755	-0.702927	88.5
+99	-0.709639	58.973553	2.874684	0.010920	-0.702978	102.3
+Time spent in resolution 2 (ITK initialization and iterating): 10.427 s.
+Stopping condition: Maximum number of iterations has been reached.
+Settings of AdaptiveStochasticGradientDescent in resolution 2:
+( SP_a 229.898706 )
+( SP_A 20.000000 )
+( SP_alpha 1.000000 )
+( SigmoidMax 1.000000 )
+( SigmoidMin -0.082197 )
+( SigmoidScale 0.000004 )
+
+
+
+=============== start of TransformParameterFile ===============
+(Transform "EulerTransform")
+(NumberOfParameters 6)
+(TransformParameters 0.001739 -0.003016 0.001802 0.091708 -0.024278 -0.878540)
+(InitialTransformParametersFileName "NoInitialTransform")
+(HowToCombineTransforms "Compose")
+
+// Image specific
+(FixedImageDimension 3)
+(MovingImageDimension 3)
+(FixedInternalImagePixelType "float")
+(MovingInternalImagePixelType "float")
+(Size 148 176 144)
+(Index 0 0 0)
+(Spacing 1.5472972393 1.5472972393 1.4900000095)
+(Origin -107.7472152710 -148.0010986328 -137.0252075195)
+(Direction -0.0000000000 0.0000000000 1.0000000000 0.0000000000 1.0000000000 0.0000000000 1.0000000000 0.0000000000 0.0000000000)
+(UseDirectionCosines "true")
+
+// EulerTransform specific
+(CenterOfRotationPoint -1.2122145891 -12.6125901937 -23.2988604307)
+(ComputeZYX "false")
+
+// ResampleInterpolator specific
+(ResampleInterpolator "FinalBSplineInterpolator")
+(FinalBSplineInterpolationOrder 3)
+
+// Resampler specific
+(Resampler "DefaultResampler")
+(DefaultPixelValue 0.000000)
+(ResultImageFormat "nii")
+(ResultImagePixelType "float")
+(CompressResultImage "false")
+
+=============== end of TransformParameterFile ===============
+
+Creating the TransformParameterFile took 0.00s
+
+Registration result checksum: 2555056533
+
+Skipping applying final transform, no resulting output image generated.
+
+Final metric value  = -0.709639
+Settings of AdaptiveStochasticGradientDescent for all resolutions:
+( SP_a 208.873148 272.805596 229.898706 )
+( SP_A 20.000000 20.000000 20.000000 )
+( SP_alpha 1.000000 1.000000 1.000000 )
+( SigmoidMax 1.000000 1.000000 1.000000 )
+( SigmoidMin -0.021285 -0.082008 -0.082197 )
+( SigmoidScale 0.000001 0.000003 0.000004 )
+
+Time spent on saving the results, applying the final transform etc.: 39 ms.
+Running elastix with parameter file 0: "/home/ybr19/Software/Registration/elastixReg/TransformationParameters/parameters_single_euler.txt", has finished.
+
+
+Current time: Wed Aug 25 09:45:51 2021.
+Time used for running elastix with this parameter file:
+  16.5s.
+
+-------------------------------------------------------------------------
+
+Total time elapsed: 16.5s.
+

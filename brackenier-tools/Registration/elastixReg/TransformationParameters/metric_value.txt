@@ -1,0 +1,23 @@
+(FixedInternalImagePixelType "float") 
+(MovingInternalImagePixelType "float") 
+(UseDirectionCosines "true") 
+(Interpolator "BSplineInterpolator") 
+(ResampleInterpolator "FinalBSplineInterpolator") 
+(Resampler "DefaultResampler") 
+(Optimizer "AdaptiveStochasticGradientDescent") 
+(Transform "EulerTransform")                // Stond op euler
+(Metric "AdvancedMattesMutualInformation") 
+(AutomaticScalesEstimation "true") 
+(HowToCombineTransforms "Compose") 
+(NumberOfHistogramBins 16) 
+(ErodeMask "true") 
+(MaximumNumberOfIterations 0)             // Op 0 om MI te berekenen in iteratie 0
+(MaximumStepLength 1) 
+(NewSamplesEveryIteration "true") 
+(ImageSampler "Random")                     // Full om zo goed mogelijke MI te hebben 
+(BSplineInterpolationOrder "1") 
+(FinalBSplineInterpolationOrder "3") 
+(DefaultPixelValue 0) 
+(WriteResultImage "false") 
+(ResultImagePixelType "float") 
+(ShowExactMetricValue "true" )

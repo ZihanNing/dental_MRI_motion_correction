@@ -1,0 +1,31 @@
+(Transform "AffineTransform")
+(NumberOfParameters 12)
+(TransformParameters 0.999433 0.000889 0.000255 -0.001464 0.998315 -0.001045 -0.000689 -0.001837 1.011123 -0.034112 0.068379 -0.167527)
+(InitialTransformParametersFileName "/home/ybr19/Software/Registration/elastixReg/TemporaryResults/OutputEuler/TransformParameters.0.txt")
+(HowToCombineTransforms "Compose")
+
+// Image specific
+(FixedImageDimension 3)
+(MovingImageDimension 3)
+(FixedInternalImagePixelType "float")
+(MovingInternalImagePixelType "float")
+(Size 148 176 144)
+(Index 0 0 0)
+(Spacing 1.5472972393 1.5472972393 1.4900000095)
+(Origin -107.7472152710 -148.0010986328 -137.0252075195)
+(Direction -0.0000000000 0.0000000000 1.0000000000 0.0000000000 1.0000000000 0.0000000000 1.0000000000 0.0000000000 0.0000000000)
+(UseDirectionCosines "true")
+
+// AdvancedAffineTransform specific
+(CenterOfRotationPoint -1.1205065891 -12.6368681937 -24.1774004307)
+
+// ResampleInterpolator specific
+(ResampleInterpolator "FinalBSplineInterpolator")
+(FinalBSplineInterpolationOrder 3)
+
+// Resampler specific
+(Resampler "DefaultResampler")
+(DefaultPixelValue 0.000000)
+(ResultImageFormat "nii")
+(ResultImagePixelType "float")
+(CompressResultImage "false")
