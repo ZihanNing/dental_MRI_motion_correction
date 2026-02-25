@@ -15,7 +15,7 @@ addpath(genpath('zihan_tools'));
 addpath(genpath('Methods'));
 addpath(genpath('Studies-deploy'));
 
-gpuDevice; % ZN: for out-of-memory issue happen on gadgetron07-pc
+gpuDevice(2); % ZN: for out-of-memory issue happen on gadgetron07-pc
 
 % SELECT STUDIES
 %List with all the names of the studies

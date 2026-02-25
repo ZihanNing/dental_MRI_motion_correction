@@ -17,10 +17,10 @@
 clear; clc;
 
 % ---- USER SETTINGS ----
-rootFolder  = '/data/gadgetron/matlab_study/ddMRI_new';   % parent folder of numbered cases
+rootFolder  = '/home/zn23/Data/ddMRI';   % parent folder of numbered cases
 studiesFile = fullfile('./Studies-deploy', 'studies.m');                              % studies.m used by deployRecon_dental
-numCases    = 8;                                                                      % total number of cases (e.g. 1..15)
-caseList    = [5 6 7 8];                                                             % modify if you want a subset, e.g. [1 3 5]
+numCases    = 1;                                                                      % total number of cases (e.g. 1..15)
+caseList    = [15];                                                             % modify if you want a subset, e.g. [1 3 5]
 
 for caseIdx = caseList
 
@@ -48,7 +48,7 @@ for caseIdx = caseList
     for fIdx = 1:numel(datFiles)
 
         % Recompute paths in case they were modified anywhere
-        rootFolder  = '/data/gadgetron/matlab_study/ddMRI_new';
+        rootFolder  = '/home/zn23/Data/ddMRI';
         caseFolder  = [fullfile(rootFolder, num2str(caseIdx)) '/'];
         datFiles    = dir(fullfile(caseFolder, '*.dat'));
 

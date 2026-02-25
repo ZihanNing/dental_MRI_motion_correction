@@ -398,14 +398,10 @@ for caseIdx = caseList
         %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%% Define pixel indexes (landmarks) based on large teeth masks
         %%% (upper and lower teeth) for MoCo
-        % generate location.txt in the path of the case as:
-        % pixel index of top of the head
-        % pixel index of the middle of the lips/teeth
-        % pixel index of the bottom of the chin/lower teeth
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % pathPrep = '...'; % already set previously
 
-        % teethMaskPath should be the full path to ...msk_teeth_fullresol.nii.gz
+        % 1) read the nifti of the teeth mask
         f = dir(fullfile(pathPrep, '*msk_teeth_fullresol.nii.gz'));
         if isempty(f)
             error('Cannot find *msk_teeth_fullresol.nii.gz in: %s', pathPrep);
@@ -413,23 +409,170 @@ for caseIdx = caseList
         if numel(f) > 1
             [~, idx] = max([f.datenum]);
             warning('Multiple matches found, using most recent: %s', f(idx).name);
-            teethMaskPath = fullfile(pathPrep, f(idx).name);
+            niiPath = fullfile(pathPrep, f(idx).name);
         else
-            teethMaskPath = fullfile(pathPrep, f(1).name);
+            niiPath = fullfile(pathPrep, f(1).name);
         end
         
-        locPath = fullfile(caseFolder, 'location.txt');
+        info = niftiinfo(niiPath);
+        V = niftiread(info);          % label volume
+        V = uint8(V);                 % ensure integer labels
 
-        [idxHeadTop, idxLipsMid, idxChinBottom, idxRLMid, locPath] = ...
-            compute_landmarks_from_teeth_mask(teethMaskPath, locPath);
+        sz = size(V);
+        if numel(sz) ~= 3
+            error('Expect a 3D mask. Got size: [%s]', num2str(sz));
+        end
 
-        fprintf('Landmarks saved to: %s\n', locPath);
-        fprintf('HF indices: head=%d, lips=%d, chin=%d (RL mid=%d)\n', ...
-            idxHeadTop, idxLipsMid, idxChinBottom, idxRLMid);
-        
-        %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%% Call the MoCo Recon
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %% 2) solve the geometry
+        % MATLAB niftiinfo gives an affine-like transform in info.Transform.T
+        T = info.Transform.T;         % 4x4
+        A = T(1:3, 1:3);              % direction/scaling for voxel axes i/j/k in world
+
+        % For each voxel axis (1..3), find which world axis (X/Y/Z) it aligns to most
+        worldAxisOfVoxel = zeros(1,3);   % 1=X,2=Y,3=Z
+        worldSignOfVoxel = zeros(1,3);   % +1 or -1
+        for vdim = 1:3
+            [~, w] = max(abs(A(:, vdim)));
+            worldAxisOfVoxel(vdim) = w;
+            worldSignOfVoxel(vdim) = sign(A(w, vdim));
+            if worldSignOfVoxel(vdim) == 0
+                worldSignOfVoxel(vdim) = 1; % fallback
+            end
+        end
+
+        % In standard NIfTI world, X≈R-L, Y≈A-P, Z≈S-I (head-foot)
+        dimRL = find(worldAxisOfVoxel == 1, 1);
+        dimAP = find(worldAxisOfVoxel == 2, 1);
+        dimHF = find(worldAxisOfVoxel == 3, 1);
+
+        if isempty(dimRL) || isempty(dimAP) || isempty(dimHF)
+            error('Failed to infer RL/AP/HF dimensions from affine. worldAxisOfVoxel=%s', mat2str(worldAxisOfVoxel));
+        end
+
+        % Interpret which HF index is "top of head" vs "bottom of chin"
+        % If HF voxel axis increases towards +Z (Superior/Head), then head is max index; otherwise head is min.
+%         hfIncreasesToSuperior = (worldSignOfVoxel(dimHF) > 0);
+        hfIncreasesToSuperior = true;   % force: head at larger HF index (your definition)
+
+        if hfIncreasesToSuperior
+            idxHeadTop = sz(dimHF);   % largest index is head/top
+        else
+            idxHeadTop = 1;           % smallest index is head/top
+        end
+
+        %% 3) find middle slice in RL direction (sagittal view)
+        % labels: upper=1, lower=2
+        upperMask = (V == 1);
+        lowerMask = (V == 2);
+
+        if ~any(upperMask(:))
+            error('Upper teeth label (1) not found in mask.');
+        end
+        if ~any(lowerMask(:))
+            error('Lower teeth label (2) not found in mask.');
+        end
+
+        % RL min/max for upper
+        subU = cell(1,3); subU(:) = {':'};
+        subU{dimRL} = 1:sz(dimRL); 
+        % Find RL indices where upper exists
+        Uproj = any(upperMask, setdiff(1:3, dimRL));   % projection along other dims
+        % Uproj is 1D along dimRL, but MATLAB keeps singleton dims; squeeze to vector
+        Uvec = squeeze(Uproj);
+        rlU = find(Uvec);
+        rlU_min = min(rlU);
+        rlU_max = max(rlU);
+
+        % RL min/max for lower
+        Lproj = any(lowerMask, setdiff(1:3, dimRL));
+        Lvec = squeeze(Lproj);
+        rlL = find(Lvec);
+        rlL_min = min(rlL);
+        rlL_max = max(rlL);
+
+        % Mid-slice in RL: average midpoints of upper/lower as you described
+        midU = (rlU_min + rlU_max) / 2;
+        midL = (rlL_min + rlL_max) / 2;
+        idxRLMid = round((midU + midL) / 2);
+        idxRLMid = max(1, min(sz(dimRL), idxRLMid));
+
+        %% 4) In that RL mid-slice (sagittal), compute HF indices
+        % Extract sagittal slice at RL = idxRLMid
+        idx = {':', ':', ':'};
+        idx{dimRL} = idxRLMid;
+        Vsag = V(idx{:});          % this is 2D but may have singleton dims
+        Vsag = squeeze(Vsag);      % now 2D, dims correspond to remaining two axes
+
+        % Figure out which axis in Vsag is HF
+        % Remaining dims in order:
+        remainDims = setdiff(1:3, dimRL, 'stable');   % e.g., [dimAP dimHF] or [dimHF dimAP]
+        % After squeeze, Vsag dimension 1 corresponds to remainDims(1), dimension 2 to remainDims(2)
+        if remainDims(1) == dimHF
+            hfAxisInSag = 1;
+        elseif remainDims(2) == dimHF
+            hfAxisInSag = 2;
+        else
+            error('Internal error: cannot map HF axis in sagittal slice.');
+        end
+
+        % Find HF positions for upper (label 1) and lower (label 2) in this slice
+        % We collapse over the other axis in the sagittal slice.
+        if hfAxisInSag == 1
+            upperHF_has = any(Vsag == 1, 2);   % vary along rows (HF), collapse columns
+            lowerHF_has = any(Vsag == 2, 2);
+        else
+            upperHF_has = any(Vsag == 1, 1);   % vary along cols (HF), collapse rows
+            lowerHF_has = any(Vsag == 2, 1);
+            upperHF_has = upperHF_has(:);
+            lowerHF_has = lowerHF_has(:);
+        end
+
+        hfUpperIdx = find(upperHF_has);
+        hfLowerIdx = find(lowerHF_has);
+
+        if isempty(hfUpperIdx) || isempty(hfLowerIdx)
+            error('In RL mid-slice (RL=%d), cannot find both upper and lower labels. Try checking mask continuity.', idxRLMid);
+        end
+
+        % Define "towards chin" vs "towards head" based on affine
+        % If HF increases to superior (head), then:
+        %   - lowest (towards chin) = min index
+        %   - highest (towards head) = max index
+        % If HF increases to inferior, swap.
+        if hfIncreasesToSuperior
+            upper_lowest_towardsChin = min(hfUpperIdx);
+            lower_highest_towardsHead = max(hfLowerIdx);
+            lower_lowest_towardsChin  = min(hfLowerIdx);
+        else
+            upper_lowest_towardsChin = max(hfUpperIdx);
+            lower_highest_towardsHead = min(hfLowerIdx);
+            lower_lowest_towardsChin  = max(hfLowerIdx);
+        end
+
+        % Middle of lips: midpoint between (lowest of upper) and (highest of lower)
+        idxLipsMid = round((double(upper_lowest_towardsChin) + double(lower_highest_towardsHead)) / 2);
+
+        % Bottom of chin: lowest position of lower teeth (towards chin)
+        idxChinBottom = lower_lowest_towardsChin;
+
+        %% 5) Write location.txt (one number per line, same as your manual format)
+        locPath = fullfile(pathPrep, 'location.txt');
+        fid = fopen(locPath, 'w');
+        if fid < 0
+            error('Cannot write: %s', locPath);
+        end
+        fprintf(fid, '%d\n%d\n%d\n', idxHeadTop, idxLipsMid, idxChinBottom);
+        fclose(fid);
+
+        %% 8) Print summary for logging
+        fprintf('\n[landmarks from teeth fullres mask]\n');
+        fprintf('NIfTI: %s\n', niiPath);
+        fprintf('Dims: size=%s | dimRL=%d dimAP=%d dimHF=%d | HF->Superior=%d\n', mat2str(sz), dimRL, dimAP, dimHF, hfIncreasesToSuperior);
+        fprintf('RL mid-slice index: %d\n', idxRLMid);
+        fprintf('Top of head (HF): %d\n', idxHeadTop);
+        fprintf('Mid lips (HF):    %d\n', idxLipsMid);
+        fprintf('Bottom chin (HF): %d\n', idxChinBottom);
+        fprintf('Saved: %s\n\n', locPath);
 
 
         
