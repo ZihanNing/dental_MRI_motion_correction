@@ -672,7 +672,7 @@ for caseIdx = caseList
         fprintf('[PIPE] Saved NGS table: %s\n', outMat);
         disp(NGS_table);
         
-        % --- suggestions
+        %% --- suggestions
 
         % Upper jaw 
         [bestUpperNGS, bestUpperRowIdx] = max(NGS(:,2));  % NGS(:,2) = UpperJaw
@@ -681,14 +681,42 @@ for caseIdx = caseList
         % Lower jaw 
         [bestLowerNGS, bestLowerRowIdx] = max(NGS(:,3));  % NGS(:,3) = LowerJaw
         bestLowerMethod = rows{bestLowerRowIdx};
+        
+        suggestPath = fullfile(caseFolder, ['Suggestion_',seqName, '.txt']);
 
-        fprintf('\n[NGS suggestion]\n');
+        fid = fopen(suggestPath, 'w');
+        if fid < 0
+            error('Cannot create suggestion file: %s', suggestPath);
+        end
+        
+        % write NGS table
+        fprintf(fid, '===== NGS Results =====\n\n');
 
-        fprintf('Upper jaw region [HF pixel index: %d - %d]: %s gives the best NGS result (NGS=%.6g)\n', ...
+        % Header row
+        fprintf(fid, '%-18s %-15s %-15s %-15s\n', ...
+            'Reconstruction', 'FullFOV', 'UpperJaw', 'LowerJaw');
+
+        fprintf(fid, '%s\n', repmat('-',1,65));
+
+        for r = 1:size(NGS,1)
+            fprintf(fid, '%-18s %-15.6g %-15.6g %-15.6g\n', ...
+                rows{r}, ...
+                NGS(r,1), NGS(r,2), NGS(r,3));
+        end
+
+        fprintf(fid, '\n');
+        fprintf(fid, 'HF index ranges:\n');
+        fprintf(fid, '  Full FOV  : %d - %d\n', fullHF_lo, fullHF_hi);
+        fprintf(fid, '  Upper Jaw : %d - %d\n', upperHF_lo, upperHF_hi);
+        fprintf(fid, '  Lower Jaw : %d - %d\n\n', lowerHF_lo, lowerHF_hi);
+
+        fprintf(fid, 'Upper jaw region [HF pixel index: %d - %d]: %s gives the best NGS result (NGS=%.6g)\n', ...
             upperHF_lo, upperHF_hi, bestUpperMethod, bestUpperNGS);
 
-        fprintf('Lower jaw region [HF pixel index: %d - %d]: %s gives the best NGS result (NGS=%.6g)\n', ...
+        fprintf(fid, 'Lower jaw region [HF pixel index: %d - %d]: %s gives the best NGS result (NGS=%.6g)\n', ...
             lowerHF_lo, lowerHF_hi, bestLowerMethod, bestLowerNGS);
+
+        fclose(fid);
 
         fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
     end % loop over dat files
