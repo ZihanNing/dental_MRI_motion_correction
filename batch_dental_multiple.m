@@ -13,7 +13,26 @@
 clear; clc;
 addpath(genpath(pwd))
 
-% ---- USER SETTINGS ----
+%% ---- Start logging ----
+timestamp = datestr(now, 'yyyymmdd_HHMMSS');
+
+logFile = fullfile(pwd, ...
+    sprintf('log_PIPE_%s.txt', timestamp));
+
+diary(logFile);
+diary on;
+
+
+if exist(logFile, 'file')
+    delete(logFile);   % optional: remove old log
+end
+
+diary(logFile);
+diary on;
+
+fprintf('==== PIPE started: %s ====\n', datestr(now));
+
+%% ---- USER SETTINGS ----
 rootFolder  = '/home/zn23/Data/ddMRI';
 studiesFile = fullfile('./Studies-deploy', 'studies.m');
 numCases    = 1;
@@ -23,13 +42,14 @@ caseList    = [15];   % subset if needed
 % Leave EMPTY {} to reconstruct ALL sequences (default behaviour)
 % Otherwise choose one or more of:
 %   {'MPRAGE'}, {'PDwSPACE'}, {'T2wSPACE'}, or combinations
-seqSelect = {'MPRAGE','T2wSPACE'};
+seqSelect = {'MPRAGE','T2wSPACE','PDwSPACE'};
 
 for caseIdx = caseList
 
     clc;
     fprintf('\n=========================================\n');
     fprintf('Processing Case %d\n', caseIdx);
+    fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
     fprintf('=========================================\n');
 
     % ---- Case folder ----
@@ -146,8 +166,10 @@ for caseIdx = caseList
         % ---- Run reconstruction ----
         try
             fprintf('Running deployRecon_dental...\n');
-            deployRecon_dental;
+            fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
+            deployRecon_dental_SENSE;
             fprintf('Reconstruction completed.\n');
+            fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
         catch ME
             fprintf(2, ...
                 'Error in Case %d, file %s:\n%s\n', ...
@@ -429,13 +451,252 @@ for caseIdx = caseList
         
         %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %%% Call the MoCo Recon
+        % run moco reconstruction with AlignedSENSE (constrained in ROI
+        % range in HF) for:
+        % - MoCo in fullFOV
+        % - MoCo in upper teeth/jaw only
+        % - MoCo in lower teeth/jaw only
+        %
+        % The result will be saved in An-Ve folders
+        % Automatically check to avoid repeated recon is ON - see skipRecon
+        % related content
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %check whether we have run this before
+        skipRecon = 0;
+        anVeDir = fullfile(caseFolder, 'An-Ve');
+        if ~isfolder(anVeDir)
+            warning('Folder not found: %s', anVeDir);
+        else
+            % seqName: datFiles.name without trailing ".dat"
+            seqName = datFiles.name;
+            if endsWith(seqName, '.dat', 'IgnoreCase', true)
+                seqName = extractBefore(seqName, strlength(seqName) - strlength(".dat") + 1);
+            else
+                warning('datFiles.name does not end with .dat: %s', datFiles.name);
+            end
 
+            f1 = fullfile(anVeDir, [seqName, '_Di_MotCorr_lowerjaw_.nii']);
+            f2 = fullfile(anVeDir, [seqName, '_Di_MotCorr_upperjaw_.nii']);
+            f3 = fullfile(anVeDir, [seqName, '_Di_MotCorr.nii']);
 
+            if isfile(f1) && isfile(f2) && isfile(f3)
+                skipRecon = 1;
+                fprintf('[PIPE] Found all An-Ve outputs. Skip following recon. \n');
+            end
+        end
         
+        if ~skipRecon
+            % ---- Save loop state (deployRecon_dental may clear) ----
+            stateFile = 'batchRecon_dental_state.mat';
+            currDir   = pwd;
 
+            save(stateFile, ...
+                 'rootFolder', 'studiesFile', 'numCases', 'caseList', ...
+                 'caseIdx', 'fIdx', 'currDir', ...
+                 'datFiles', 'caseFolder', 'seqSelect');
+
+            % ---- Run reconstruction: fullFOV, upper & lower teeth ----
+
+            try
+                fprintf('Running deployRecon_dental (MoCo)...\n');
+                fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
+                deployRecon_dental_MoCo;
+                fprintf('MoCo Reconstruction completed.\n');
+                fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
+
+            catch ME
+                fprintf(2, ...
+                    'Error in Case %d, file %s:\n%s\n', ...
+                    caseIdx, baseName, ME.message);
+            end
+
+            % ---- Restore state ----
+            if exist('batchRecon_dental_state.mat', 'file')
+                load('batchRecon_dental_state.mat', ...
+                     'rootFolder', 'studiesFile', 'numCases', 'caseList', ...
+                     'caseIdx', 'fIdx', 'currDir', ...
+                     'datFiles', 'caseFolder', 'seqSelect');
+
+                try
+                    cd(currDir);
+                catch
+                    % If directory no longer exists, just ignore
+                end
+                delete('batchRecon_dental_state.mat');
+            else
+                warning('State file %s not found. Loop variables may be lost.', stateFile);
+            end
+        end
+
+
+        %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        %%% NGS evaluation
+        % compute the NGS in different region: fullFOV, upperjaw, lowerjaw
+        % for all the result (no MoCo, MoCo based on fullFOV, MoCo based on
+        % upper jaw, MoCo based on lower jaw)
+        % tight head mask is used for computation (generated by nnunet)
+        %
+        % results generated in NGS_table: saved in caseFolder as 'xxx_NGS.mat'
+        % suggestions made based on NGS results (in a specific region,
+        % which result should be used)
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        % ---read all files (results)
+        anVeDir = fullfile(caseFolder, 'An-Ve');
+        if ~isfolder(anVeDir), error('Folder not found: %s', anVeDir); end
+
+        seqName = datFiles.name;
+        if endsWith(seqName, '.dat', 'IgnoreCase', true)
+            seqName = extractBefore(seqName, strlength(seqName) - strlength(".dat") + 1);
+        end
+
+        p_noMoCo   = fullfile(anVeDir, [seqName, '_Aq_MotCorr.nii']);
+        p_fullFOV  = fullfile(anVeDir, [seqName, '_Di_MotCorr.nii']);
+        p_upperjaw = fullfile(anVeDir, [seqName, '_Di_MotCorr_upperjaw_.nii']);
+        p_lowerjaw = fullfile(anVeDir, [seqName, '_Di_MotCorr_lowerjaw_.nii']);
+
+        if ~isfile(p_noMoCo),   error('Missing: %s', p_noMoCo);   end
+        if ~isfile(p_fullFOV),  error('Missing: %s', p_fullFOV);  end
+        if ~isfile(p_upperjaw), error('Missing: %s', p_upperjaw); end
+        if ~isfile(p_lowerjaw), error('Missing: %s', p_lowerjaw); end
+        
+        info_noMoCo   = niftiinfo(p_noMoCo);    I_noMoCo   = single(niftiread(info_noMoCo));
+        info_fullFOV  = niftiinfo(p_fullFOV);   I_fullFOV  = single(niftiread(info_fullFOV));
+        info_upperjaw = niftiinfo(p_upperjaw);  I_upperjaw = single(niftiread(info_upperjaw));
+        info_lowerjaw = niftiinfo(p_lowerjaw);  I_lowerjaw = single(niftiread(info_lowerjaw));
+        
+        sz = size(I_fullFOV);
+        if ~isequal(size(I_noMoCo), sz) || ~isequal(size(I_upperjaw), sz) || ~isequal(size(I_lowerjaw), sz)
+            error('Image sizes do not match. noMoCo=%s fullFOV=%s upperjaw=%s lowerjaw=%s', ...
+                mat2str(size(I_noMoCo)), mat2str(sz), mat2str(size(I_upperjaw)), mat2str(size(I_lowerjaw)));
+        end
+        
+        % ---read the head mask (size matched)
+        segDir = fullfile(caseFolder, 'An-Aq', 'seg');
+        headMaskPath = fullfile(segDir, [seqName, '_msk_head_fullresol.nii.gz']);
+        if ~isfile(headMaskPath)
+            error('Head mask not found: %s', headMaskPath);
+        end
+        headInfo = niftiinfo(headMaskPath);
+        headMask = niftiread(headInfo);
+        headMask = (headMask > 0);
+
+        if ~isequal(size(headMask), sz)
+            error('Head mask size (%s) does not match images (%s).', mat2str(size(headMask)), mat2str(sz));
+        end
+        
+        % ---read location.txt and define regions for NGS evaluation
+        locPath = fullfile(caseFolder, 'location.txt');
+        if ~isfile(locPath)
+            error('location.txt not found: %s', locPath);
+        end
+        vals = load(locPath);   % expects 3 lines with numbers
+        if numel(vals) < 3
+            error('location.txt must have 3 numbers (headTop, lipsMid, chinBottom). Got: %d', numel(vals));
+        end
+        idxHeadTop_txt = round(vals(1));
+        idxLipsMid_txt = round(vals(2));
+        idxChinBot_txt = round(vals(3));
+
+        % Determine which dimension is HF from the NIfTI geometry (use fullFOV image header)
+        T = info_fullFOV.Transform.T;
+        A = T(1:3,1:3);
+        worldAxisOfVoxel = zeros(1,3); % 1=X (RL), 2=Y (AP), 3=Z (HF)
+        for vdim = 1:3
+            [~, w] = max(abs(A(:,vdim)));
+            worldAxisOfVoxel(vdim) = w;
+        end
+        dimHF = find(worldAxisOfVoxel == 3, 1);
+        if isempty(dimHF)
+            error('Failed to infer HF dimension from affine. worldAxisOfVoxel=%s', mat2str(worldAxisOfVoxel));
+        end
+
+        % Clamp indices to valid HF index range
+        HFmax = sz(dimHF);
+        idxHeadTop_txt = max(1, min(HFmax, idxHeadTop_txt));
+        idxLipsMid_txt = max(1, min(HFmax, idxLipsMid_txt));
+        idxChinBot_txt = max(1, min(HFmax, idxChinBot_txt));
+
+        % Regions 
+        upperHF_lo = idxLipsMid_txt;
+        upperHF_hi = idxHeadTop_txt;
+        lowerHF_lo = idxChinBot_txt;
+        lowerHF_hi = max(1, idxLipsMid_txt - 1);
+        fullHF_lo = 1;
+        fullHF_hi = idxHeadTop_txt;
+
+        % Build HF range mask (broadcastable)
+        hfIdx = (1:HFmax);
+        hfInFull  = (hfIdx >= fullHF_lo  & hfIdx <= fullHF_hi);
+        hfInUpper = (hfIdx >= upperHF_lo & hfIdx <= upperHF_hi);
+        hfInLower = (hfIdx >= lowerHF_lo & hfIdx <= lowerHF_hi);
+
+        shape = ones(1,3); shape(dimHF) = HFmax;
+        hfInFull3  = reshape(hfInFull,  shape);
+        hfInUpper3 = reshape(hfInUpper, shape);
+        hfInLower3 = reshape(hfInLower, shape);
+
+        roi_full  = headMask & hfInFull3;
+        roi_upper = headMask & hfInUpper3;
+        roi_lower = headMask & hfInLower3;
+
+        %  --- compute NGS
+        vx = info_fullFOV.PixelDimensions(1);
+        vy = info_fullFOV.PixelDimensions(2);
+        vz = info_fullFOV.PixelDimensions(3);
+
+        NGS = nan(4,3);
+
+        % Row order: noMoCo, fullFOV, upperjaw, lowerjaw
+        imgs  = {I_noMoCo, I_fullFOV, I_upperjaw, I_lowerjaw};
+        infs  = {info_noMoCo, info_fullFOV, info_upperjaw, info_lowerjaw};
+        rows  = {'NoMoCo_Aq', 'MoCo_FullFOV', 'MoCo_UpperJaw', 'MoCo_LowerJaw'};
+        cols  = {'FullFOV', 'UpperJaw', 'LowerJaw'};
+        rois  = {roi_full, roi_upper, roi_lower};
+
+        for r = 1:4
+            for c = 1:3
+                NGS(r,c) = compute_ngs(imgs{r}, rois{c}, [vx vy vz]);
+            end
+        end
+        
+        % print the NGS result table
+        NGS_table = array2table(NGS, 'VariableNames', cols, 'RowNames', rows);
+        % save the result table
+        outMat = fullfile(caseFolder, [seqName, '_NGS.mat']);
+        save(outMat, 'NGS_table', 'NGS', 'rows', 'cols', ...
+            'p_noMoCo', 'p_fullFOV', 'p_upperjaw', 'p_lowerjaw', ...
+            'headMaskPath', 'locPath', ...
+            'idxHeadTop_txt', 'idxLipsMid_txt', 'idxChinBot_txt', ...
+            'dimHF', 'fullHF_lo', 'fullHF_hi', 'upperHF_lo', 'upperHF_hi', 'lowerHF_lo', 'lowerHF_hi');
+
+        fprintf('[PIPE] Saved NGS table: %s\n', outMat);
+        disp(NGS_table);
+        
+        % --- suggestions
+
+        % Upper jaw 
+        [bestUpperNGS, bestUpperRowIdx] = max(NGS(:,2));  % NGS(:,2) = UpperJaw
+        bestUpperMethod = rows{bestUpperRowIdx};
+
+        % Lower jaw 
+        [bestLowerNGS, bestLowerRowIdx] = max(NGS(:,3));  % NGS(:,3) = LowerJaw
+        bestLowerMethod = rows{bestLowerRowIdx};
+
+        fprintf('\n[NGS suggestion]\n');
+
+        fprintf('Upper jaw region [HF pixel index: %d - %d]: %s gives the best NGS result (NGS=%.6g)\n', ...
+            upperHF_lo, upperHF_hi, bestUpperMethod, bestUpperNGS);
+
+        fprintf('Lower jaw region [HF pixel index: %d - %d]: %s gives the best NGS result (NGS=%.6g)\n', ...
+            lowerHF_lo, lowerHF_hi, bestLowerMethod, bestLowerNGS);
+
+        fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
     end % loop over dat files
 
 end % loop over cases
 
-fprintf('\nAll requested cases processed.\n');
+fprintf('Time: %s \n', datestr(now, 'yyyy/mm/dd HH:MM:SS'))
+fprintf('\nAll requested cases processed.\n')
+
+fprintf('==== PIPE finished: %s ====\n', datestr(now));
+diary off

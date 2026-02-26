@@ -1,3 +1,5 @@
 Studies-deploy/
 *.asv
 *.mat
+*.txt
+*.m~
