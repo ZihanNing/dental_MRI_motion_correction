@@ -264,7 +264,7 @@ f = 1
     
     % expand the mask a bit and not let it to tight (endore some motion)
     BW = headMask > 0;
-    N = 10; % expand mask by N voxels
+    N = 30; % expand mask by N voxels % 10 used to be 
     BWd = imdilate(BW, strel('sphere', N));   % 3D dilation
     BWd = imclose(BWd, strel('sphere', 1));  % light closing
     BWd = imfill(BWd, 'holes');             % fill internal holes (3D)

@@ -36,7 +36,7 @@ fprintf('==== PIPE started: %s ====\n', datestr(now));
 rootFolder  = '/home/zn23/Data/ddMRI';
 studiesFile = fullfile('./Studies-deploy', 'studies.m');
 numCases    = 1;
-caseList    = [15];   % subset if needed
+caseList    = [8];   % subset if needed, e.g., [15]
 
 % >>> NEW: sequence selection <<<
 % Leave EMPTY {} to reconstruct ALL sequences (default behaviour)
@@ -468,7 +468,7 @@ for caseIdx = caseList
             warning('Folder not found: %s', anVeDir);
         else
             % seqName: datFiles.name without trailing ".dat"
-            seqName = datFiles.name;
+            seqName = datFiles(fIdx).name;
             if endsWith(seqName, '.dat', 'IgnoreCase', true)
                 seqName = extractBefore(seqName, strlength(seqName) - strlength(".dat") + 1);
             else
@@ -544,7 +544,7 @@ for caseIdx = caseList
         anVeDir = fullfile(caseFolder, 'An-Ve');
         if ~isfolder(anVeDir), error('Folder not found: %s', anVeDir); end
 
-        seqName = datFiles.name;
+        seqName = datFiles(fIdx).name;
         if endsWith(seqName, '.dat', 'IgnoreCase', true)
             seqName = extractBefore(seqName, strlength(seqName) - strlength(".dat") + 1);
         end

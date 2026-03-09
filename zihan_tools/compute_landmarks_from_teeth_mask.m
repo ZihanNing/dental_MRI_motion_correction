@@ -111,18 +111,29 @@ else
 end
 
 hfUpperIdx = find(upperHF_has);
-hfLowerIdx = find(lowerHF_has);
 
-if isempty(hfUpperIdx) || isempty(hfLowerIdx)
-    error('In RL mid-slice (RL=%d), cannot find both upper and lower labels.', idxRLMid);
+if isempty(hfUpperIdx) 
+    error('In RL mid-slice (RL=%d), cannot find both upper label.', idxRLMid);
 end
+
+% ---- Lower jaw: recompute from full 3D mask (V), not from Vsag ----
+linLowerAll = find(V == 2);
+if isempty(linLowerAll)
+    error('Cannot find lower-jaw label (==2) anywhere in the 3D mask.');
+end
+
+subAll = cell(1,3);
+[subAll{:}] = ind2sub(sz, linLowerAll);
+hfAllLower = subAll{dimHF};                 % all HF indices where V==2
+hfLowerIdx = unique(hfAllLower);            % analogous to "find(lowerHF_has)"
 
 % With your upside-down convention:
 % - "towards chin" = smaller HF index
 % - "towards head" = larger HF index
 upper_lowest_towardsChin  = min(hfUpperIdx);
-lower_highest_towardsHead = max(hfLowerIdx);
 lower_lowest_towardsChin  = min(hfLowerIdx);
+lower_highest_towardsHead = max(hfLowerIdx);
+
 
 idxLipsMid    = round((double(upper_lowest_towardsChin) + double(lower_highest_towardsHead)) / 2);
 idxChinBottom = lower_lowest_towardsChin;
