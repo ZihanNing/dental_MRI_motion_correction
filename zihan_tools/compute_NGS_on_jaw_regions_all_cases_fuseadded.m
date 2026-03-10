@@ -26,8 +26,7 @@
 % @King's College London
 % 2026-03-09
 
-% this computation is different from the batch processing, DO NOT USE FOR
-% COMPARISON
+% This is the script for final NGS computation & statistics
 
 
 clear; clc;
