@@ -1,4 +1,4 @@
-function ngs = compute_ngs(I, roiMask, voxSize)
+function ngs = compute_ngs_wofilter(I, roiMask, voxSize)
 % Compute Normalized Gradient Square (NGS) inside ROI, excluding ROI edges.
 %
 % ngs = sum(|∇I|^2) / sum(I^2) over voxels that are strictly inside ROI

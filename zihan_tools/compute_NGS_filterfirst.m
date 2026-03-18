@@ -42,11 +42,12 @@ selectedCases = [];   % [] means all
 % User settings
 % -------------------------------------------------------------------------
 hfDim = 1;   % Foot-Head / Superior-Inferior dimension in the image volume
+sigmaNGS = 0.3;   % very slight Gaussian smoothing before gradient computation
 
 % Recon definitions
 reconSpecs = struct( ...
     'name',      {'NoMoCo_Aq',           'MoCo_FullFOV',       'MoCo_UpperJaw',             'MoCo_LowerJaw',             'MoCo_Fused'}, ...
-    'includeKey',{'_Aq_MotCorr.nii',     '_Di_MotCorr.nii',    '_Di_MotCorr_upperjaw_',     '_Di_MotCorr_lowerjaw_',     'Di_fused_nearest_'} ...
+    'includeKey',{'_Aq_MotCorr.nii',     '_Di_MotCorr.nii',    '_Di_MotCorr_upperjaw_',     '_Di_MotCorr_lowerjaw_',     'Di_fused'} ...
 );
 
 % Image file extensions to consider
@@ -284,8 +285,8 @@ for c = 1:numel(caseNames)
         end
 
         % Compute NGS: upper/lower jaw regions
-        ngsUpper = compute_ngs(I, maskUpper);
-        ngsLower = compute_ngs(I, maskLower);
+        ngsUpper = compute_ngs(I, maskUpper, sigmaNGS);
+        ngsLower = compute_ngs(I, maskLower, sigmaNGS);
 
         % Compute NGS: full FOV (head mask)
         if isempty(headMask)
@@ -295,7 +296,7 @@ for c = 1:numel(caseNames)
                 caseID, reconName, mat2str(size(I)), mat2str(size(headMask)));
             ngsFull = NaN;
         else
-            ngsFull = compute_ngs(I, headMask);
+            ngsFull = compute_ngs(I, headMask, sigmaNGS);
         end
 
         row.(fU) = ngsUpper;
@@ -441,6 +442,43 @@ function imgPath = findReconNifti(caseDir, includeKey, reconName, imgExts)
 
     [~, idx] = max([hits.datenum]);
     imgPath = fullfile(hits(idx).folder, hits(idx).name);
+end
+function ngs = compute_ngs(I, mask, sigma)
+% Compute NGS with optional very slight Gaussian smoothing before gradient.
+%
+% NGS = sum(|grad(I)|^2 within mask) / sum(I^2 within mask)
+
+    I = double(I);
+    mask = logical(mask);
+
+    if nargin < 3
+        sigma = 0;
+    end
+
+    if ~any(mask(:))
+        ngs = NaN;
+        return;
+    end
+
+    % Very slight smoothing before gradient computation
+    if sigma > 0
+        I = imgaussfilt3(I, sigma);
+    end
+
+    gx = gradientCentral(I, 1);
+    gy = gradientCentral(I, 2);
+    gz = gradientCentral(I, 3);
+
+    g2 = gx.^2 + gy.^2 + gz.^2;
+
+    num = sum(g2(mask), 'omitnan');
+    den = sum(I(mask).^2, 'omitnan');
+
+    if den <= 0
+        ngs = NaN;
+    else
+        ngs = num / den;
+    end
 end
 
 function g = gradientCentral(I, dim)

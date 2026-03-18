@@ -124,8 +124,20 @@ end
 
 subAll = cell(1,3);
 [subAll{:}] = ind2sub(sz, linLowerAll);
-hfAllLower = subAll{dimHF};                 % all HF indices where V==2
-hfLowerIdx = unique(hfAllLower);            % analogous to "find(lowerHF_has)"
+hfAllLower = subAll{dimHF};
+hfLowerIdx = unique(hfAllLower);
+
+% Keep only the longest continuous HF segment
+d = diff(hfLowerIdx);
+breakPos = find(d > 1);
+
+segStart = [1; breakPos + 1];
+segEnd   = [breakPos; numel(hfLowerIdx)];
+
+segLen = segEnd - segStart + 1;
+[~, iKeep] = max(segLen);
+
+hfLowerIdx = hfLowerIdx(segStart(iKeep):segEnd(iKeep));
 
 % With your upside-down convention:
 % - "towards chin" = smaller HF index

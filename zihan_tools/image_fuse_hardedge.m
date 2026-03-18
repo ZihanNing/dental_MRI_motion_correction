@@ -63,7 +63,7 @@ for iCase = 1:numel(caseDirs)
         %% ----------------------------------------------------------------
         % 2. Read images and location.txt
         %% ----------------------------------------------------------------
-        locFile = fullfile(caseFolder, 'location_.txt');
+        locFile = fullfile(caseFolder, 'location.txt');
 
         % If location.txt does not exist, try to generate it from teeth mask
         if ~exist(locFile, 'file')
@@ -170,7 +170,7 @@ for iCase = 1:numel(caseDirs)
         %% ----------------------------------------------------------------
         % Warp I_U into I_L space using T_{U->L}
         IU_hat = imwarp(IU, tform_U_to_L, 'OutputView', imref3d(size(IL)), ...
-                'Interp', 'nearest', 'FillValues', 0);
+                'Interp', 'cubic');
 
         %% ----------------------------------------------------------------
         % 6. Build w(x) using distance-transform feathering
@@ -198,9 +198,18 @@ for iCase = 1:numel(caseDirs)
         % Upper-only region: directly use warped upper image
         Ifused(upperOnly) = IU_hat(upperOnly);
 
-        % Overlap region: weighted blending
-        Ifused(overlap) = w(overlap) .* IU_hat(overlap) + ...
-                          (1 - w(overlap)) .* IL(overlap);
+        % Overlap region: hard switch instead of weighted blending
+        % Choose the image from the side to which the voxel is closer.
+        tmpIU = IU_hat(overlap);
+        tmpIL = IL(overlap);
+        tmpDU = dU(overlap);
+        tmpDL = dL(overlap);
+
+        useUpper = tmpDU >= tmpDL;   % closer to upper side
+        tmpFused = tmpIL;            % default use lower-space image
+        tmpFused(useUpper) = tmpIU(useUpper);
+
+        Ifused(overlap) = tmpFused;
 
         %% ----------------------------------------------------------------
         % 8. Save fused image
@@ -296,9 +305,9 @@ function outFile = buildOutputName(caseFolder, upperFile)
 
     % Replace upperjaw token if present; otherwise append
     if contains(baseName, '_Di_MotCorr_upperjaw_')
-        outBase = strrep(baseName, '_Di_MotCorr_upperjaw_', '_Di_fused_nearest_');
+        outBase = strrep(baseName, '_Di_MotCorr_upperjaw_', '_Di_fused_');
     else
-        outBase = [baseName, '_Di_fused_nearest_'];
+        outBase = [baseName, '_Di_fused'];
     end
 
     outFile = fullfile(caseFolder, [outBase, '.nii']);
