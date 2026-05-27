@@ -4,33 +4,29 @@ This repository contains the main reconstruction and workflow code accompanying 
 
 **Motion-Robust Dental MRI for Imaging of Paediatric Dental Trauma**
 
-In the paper, we describe the proposed method as a **region-adaptive motion correction reconstruction tailored to dental MRI**. The pipeline combines:
+In the paper, we describe the proposed method as a **region-adaptive motion correction reconstruction tailored to dental MRI**. 
 
-- Cartesian dental MRI reconstruction
-- region-specific motion-corrected reconstructions
-- nnUNetv2-based head and teeth segmentation
-- landmark extraction from teeth masks
-- region-adaptive fusion of upper-jaw and lower-jaw motion-corrected images
+![Overview of the method](demonstration/demo.png)
 
-The core workflow is implemented in [batch_dental_multiple.m](/Users/ningzihan/Documents/dental_moco/batch_dental_multiple.m), while the main reconstruction routines remain in this Git repository.
+The proposed automated region-adaptive motion-correction reconstruction identifies maxillary and mandibular regions, performs region-specific motion estimation and correction, and fuses the corrected regions into a single image for clinical review. 
+
+The core workflow is implemented in [batch_dental_multiple.m](https://github.com/ZihanNing/dental_MRI_motion_correction/blob/main/batch_dental_multiple.m), while the main reconstruction routines remain in this Git repository.
 
 ## Repository Contents
 
 - `batch_dental_multiple.m`: end-to-end batch workflow for case processing
 - `deployRecon_dental_SENSE.m`: baseline SENSE reconstruction
-- `deployRecon_dental_MoCo.m`: motion-corrected reconstruction
-- `zihan_tools/image_fusion.m`: fusion of upper-jaw and lower-jaw MoCo reconstructions
+- `deployRecon_dental_MoCo.m`: region-adaptive motion-correction reconstruction
+- `zihan_tools/image_fusion.m`: fusion of upper-jaw and lower-jaw MoCo reconstructions and other dependent scripts
 - `Python/`: preprocessing, intensity normalization, and mask restoration scripts for nnUNet-based segmentation
-- `brackenier-tools/` and `dhcp-repo-release07/`: code dependencies included with this repository
+- `brackenier-tools/` and `dhcp-repo-release07/`: code dependencies included with this repository for motion-correction reconstruction
 
 ## Release Plan
 
 The full open-source release is split across three locations:
 
 - **GitHub repository**: MATLAB workflow, reconstruction code, and utility scripts
-- **Hugging Face**: trained nnUNetv2 models for:
-  - head segmentation
-  - teeth segmentation
+- **Hugging Face**: trained nnUNetv2 models for head segmentation and teeth segmentation
 - **Zenodo**: demo cases for testing the released pipeline
 
 Release links will be added here when public:
@@ -81,12 +77,9 @@ The current batch script assumes:
 
 - a Conda environment name such as `nnunetv2`
 - `nnUNetv2_predict` is available in that environment
-- nnUNet paths are configured via:
-  - `nnUNet_raw`
-  - `nnUNet_preprocessed`
-  - `nnUNet_results`
+- nnUNet paths are configured via `nnUNet_raw`, `nnUNet_preprocessed`, and `nnUNet_results`
 
-In [batch_dental_multiple.m](/Users/ningzihan/Documents/dental_moco/batch_dental_multiple.m), these are currently set through the local variables `CONDA`, `ENVNAME`, and `NNUNET_BASE`. You will likely need to edit these paths for your system before running the workflow.
+In [batch_dental_multiple.m](./batch_dental_multiple.m), these are currently set through the local variables `CONDA`, `ENVNAME`, and `NNUNET_BASE`. You will likely need to edit these paths for your system before running the workflow.
 
 ### Trained Model Weights
 
@@ -142,14 +135,8 @@ Recommended quick-start:
 1. Download and unpack the demo data from Zenodo.
 2. Place the demo case folders inside `Studies-deploy/`.
 3. Download the trained nnUNet models from Hugging Face and install them into your local nnUNetv2 setup.
-4. Open [batch_dental_multiple.m](/Users/ningzihan/Documents/dental_moco/batch_dental_multiple.m) in MATLAB.
-5. Update the local configuration as needed:
-   - `rootFolder`
-   - `caseList`
-   - `seqSelect`
-   - `CONDA`
-   - `ENVNAME`
-   - `NNUNET_BASE`
+4. Open [batch_dental_multiple.m](https://github.com/ZihanNing/dental_MRI_motion_correction/blob/main/batch_dental_multiple.m) in MATLAB.
+5. Update the local configuration as needed: `rootFolder`, `caseList`, `seqSelect`, `CONDA`, `ENVNAME`, and `NNUNET_BASE`.
 6. Run `batch_dental_multiple`.
 
 For a minimal test, start with a single case:
