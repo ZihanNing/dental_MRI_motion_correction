@@ -17,6 +17,8 @@
 % @King's College London
 % 2026-03-11
 
+% This is in use 24-Mar-2026 by Zihan
+
 clear; clc;
 
 rootDir = '/home/zn23/Data/ddMRI/';
@@ -76,7 +78,7 @@ for c = 1:numel(caseNamesAll)
     % Find the three source files
     p_noMoCo  = findReconNifti(caseDir, '_Aq_MotCorr.nii', 'NoMoCo');
     p_fullFOV = findReconNifti(caseDir, '_Di_MotCorr.nii', 'MoCoFullFOV');
-    p_fused   = findReconNifti(caseDir, '_Di_fused_.nii', 'MoCoFused');
+    p_fused   = findReconNifti(caseDir, '_Di_fused_nearest_.nii', 'MoCoFused');
 
     if isempty(p_noMoCo)
         warning('[%s] No-MoCo image not found. Skipping case.', caseID);

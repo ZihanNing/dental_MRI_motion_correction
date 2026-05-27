@@ -16,6 +16,7 @@ function compute_motion_trace_correlation_and_split_outlierremoval()
 % @King's College London
 % 17-Mar-2026
 
+
 clc;
 clear;
 close all;
@@ -29,7 +30,7 @@ rootDir = '/home/zn23/Data/ddMRI/';
 thr_worst_diff_ul = 0.9;   % equivalent to corr <= 0.30 when d = 1-r
 
 % Outlier detection threshold (robust z-score on shot-to-shot change)
-outlier_z_thr = 18.0;
+outlier_z_thr = 15.0;
 
 % Dimension names
 dimNames = {'Tra1','Tra2','Tra3','Rot1','Rot2','Rot3'};

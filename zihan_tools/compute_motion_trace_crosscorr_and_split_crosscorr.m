@@ -15,6 +15,8 @@ function compute_motion_trace_crosscorr_and_split_crosscorr()
 % @King's College London
 % 17-Mar-2026
 
+% This is in use 24-Mar-2026 by Zihan
+
 clc;
 clear;
 close all;
@@ -32,7 +34,7 @@ thr_mean_xcorr_ul = 0.6098;
 maxLag = 3;
 
 % Outlier detection threshold (robust z-score on shot-to-shot change)
-outlier_z_thr = 18.0;
+outlier_z_thr = 15.0;
 
 % Dimension names
 dimNames = {'Tra1','Tra2','Tra3','Rot1','Rot2','Rot3'};
