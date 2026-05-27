@@ -21,7 +21,7 @@ clear; clc;
 %% User settings
 rootDir = '/home/zn23/Data/ddMRI/';
 hfDim = 1;                 % head-foot dimension in the NIfTI array
-overlapHalfWidth = 2;      % voxels; controls overlap band for feathering
+overlapHalfWidth = 5;      % voxels; controls overlap band for feathering
 saveAsSingle = true;       % save fused image as single precision
 verbose = true;
 
