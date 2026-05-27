@@ -6,7 +6,7 @@ This repository contains the main reconstruction and workflow code accompanying 
 
 In the paper, we describe the proposed method as a **region-adaptive motion correction reconstruction tailored to dental MRI**. 
 
-![Overview of the method](demonstration/demo.png)
+![Overview of the method](./demostration/demo.png)
 
 The proposed automated region-adaptive motion-correction reconstruction identifies maxillary and mandibular regions, performs region-specific motion estimation and correction, and fuses the corrected regions into a single image for clinical review. 
 
