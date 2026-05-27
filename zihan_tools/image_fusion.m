@@ -182,7 +182,7 @@ end
 
 niftiwrite(IfusedToSave, outFile, outInfo, 'Compressed', false);
 
-save(fullfile(caseFolder, [seqName, '_Di_fused_transform.mat']), ...
+save(fullfile(anVeDir, [seqName, '_Di_fused_transform.mat']), ...
      'tform_U_to_L', 'tform_L_to_U', ...
      'idx1', 'idx2', 'idx3', ...
      'opts');
@@ -269,7 +269,7 @@ out = convn(double(mask), kernel, 'same') > 0;
 end
 
 function outFile = buildOutputName(caseFolder, upperFile)
-[~, baseName, ~] = fileparts(upperFile);
+[anVeDir, baseName, ~] = fileparts(upperFile);
 
 if endsWith(baseName, '.nii', 'IgnoreCase', true)
     baseName = erase(baseName, '.nii');
@@ -281,5 +281,5 @@ else
     outBase = [baseName, '_Di_fused_nearest_'];
 end
 
-outFile = fullfile(caseFolder, [outBase, '.nii']);
+outFile = fullfile(anVeDir, [outBase, '.nii']);
 end

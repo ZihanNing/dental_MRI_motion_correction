@@ -1,55 +1,213 @@
-# 3D-moco-siemens
-This repository contains the reconstruction code to perform data-driven motion correction on Cartesian acquisitions. For optimal performance, a self-navigated trajectory should be deployed (e.g. DISORDER). 
-It is built on the methods developed under the [DISORDER framework](https://onlinelibrary.wiley.com/doi/10.1002/mrm.28157). The current version includes the following extensions:
-- Dealing with Siemens data structures.
-- Extension to non-self-navigated trajectories as well.
-- The option to correct for pose-dependent B0 correction, as presented in [Brackenier et al., MRM, 2022](https://onlinelibrary.wiley.com/doi/10.1002/mrm.29255)
-- The option to correct for temporally varying low-order B0 variations, as presented in [Brackenier et al., ISMRM, 2024]
-- Using Pilot Tone signals to guide the motion correction [Brackenier et al., MRM, 2024](https://onlinelibrary.wiley.com/doi/full/10.1002/mrm.30161)
+# Motion-Robust Dental MRI for Paediatric Dental Trauma
 
-## Table of Contents
-- [Dependencies](#Dependencies)
-- [Installation](#Installation)
-- [Usage](#Usage)
-- [Contributors](#Contributors)
-- [License](#License)
+This repository contains the main reconstruction and workflow code accompanying our paper:
 
-## Dependencies
-The code runs in MATLAB and does not require a specific version.
-This repository depends on 2 other repositories built in-house:
-- The code base developed for the [Developing Human Connectome Project](https://www.developingconnectome.org/). 
-- The code base developed during Yannick Brackenier's thesis (brackenier-tools). 
+**Motion-Robust Dental MRI for Imaging of Paediatric Dental Trauma**
+
+In the paper, we describe the proposed method as a **region-adaptive motion correction reconstruction tailored to dental MRI**. The pipeline combines:
+
+- Cartesian dental MRI reconstruction
+- region-specific motion-corrected reconstructions
+- nnUNetv2-based head and teeth segmentation
+- landmark extraction from teeth masks
+- region-adaptive fusion of upper-jaw and lower-jaw motion-corrected images
+
+The core workflow is implemented in [batch_dental_multiple.m](/Users/ningzihan/Documents/dental_moco/batch_dental_multiple.m), while the main reconstruction routines remain in this Git repository.
+
+## Repository Contents
+
+- `batch_dental_multiple.m`: end-to-end batch workflow for case processing
+- `deployRecon_dental_SENSE.m`: baseline SENSE reconstruction
+- `deployRecon_dental_MoCo.m`: motion-corrected reconstruction
+- `zihan_tools/image_fusion.m`: fusion of upper-jaw and lower-jaw MoCo reconstructions
+- `Python/`: preprocessing, intensity normalization, and mask restoration scripts for nnUNet-based segmentation
+- `brackenier-tools/` and `dhcp-repo-release07/`: code dependencies included with this repository
+
+## Release Plan
+
+The full open-source release is split across three locations:
+
+- **GitHub repository**: MATLAB workflow, reconstruction code, and utility scripts
+- **Hugging Face**: trained nnUNetv2 models for:
+  - head segmentation
+  - teeth segmentation
+- **Zenodo**: demo cases for testing the released pipeline
+
+Release links will be added here when public:
+
+- Hugging Face models: `TBD`
+- Zenodo demo cases: `TBD`
+
+## Requirements
+
+### MATLAB
+
+The workflow has been run on **MATLAB R2019a** on our server.
+
+At minimum, the current workflow expects MATLAB with NIfTI and image-processing functionality used by:
+
+- `niftiinfo`, `niftiread`, `niftiwrite`
+- `imgaussfilt3`
+- `imregtform`
+- `imwarp`
+- `imref3d`
+- `bwdist`
+
+In practice, **Image Processing Toolbox** is required for the segmentation post-processing and image-fusion steps.
+
+Some reconstruction code paths in this repository also use GPU-aware MATLAB arrays (`gpuArray`). A GPU is not strictly required for every script, but it may be important for practical reconstruction speed depending on your setup.
+
+### Python
+
+The segmentation preprocessing and mask restoration scripts in `Python/` require Python packages including:
+
+- `numpy`
+- `scipy`
+- `nibabel`
+
+These scripts are called from MATLAB in `batch_dental_multiple.m`.
+
+### nnUNetv2
+
+To run the segmentation-enabled workflow, you will need **nnUNetv2** installed in a Python environment.
+
+Essential links:
+
+- nnUNet repository: [MIC-DKFZ/nnUNet](https://github.com/MIC-DKFZ/nnUNet)
+- nnUNetv2 installation and setup: [official installation guide](https://github.com/MIC-DKFZ/nnUNet/blob/master/documentation/getting-started/installation-and-setup.md)
+- PyTorch installation: [PyTorch local installation guide](https://pytorch.org/get-started/locally/)
+
+The current batch script assumes:
+
+- a Conda environment name such as `nnunetv2`
+- `nnUNetv2_predict` is available in that environment
+- nnUNet paths are configured via:
+  - `nnUNet_raw`
+  - `nnUNet_preprocessed`
+  - `nnUNet_results`
+
+In [batch_dental_multiple.m](/Users/ningzihan/Documents/dental_moco/batch_dental_multiple.m), these are currently set through the local variables `CONDA`, `ENVNAME`, and `NNUNET_BASE`. You will likely need to edit these paths for your system before running the workflow.
+
+### Trained Model Weights
+
+The repository does **not** store the trained nnUNet model weights directly. Instead, the trained models for:
+
+- teeth segmentation
+- head segmentation
+
+will be distributed separately on Hugging Face. After downloading them, place them into the nnUNet results structure expected by your local nnUNetv2 installation.
 
 ## Installation
-To install all necessary scripts, this and other repositories need to be cloned for this repository to run. In order to do so, run the following commands in the shell:
-```sh
-git clone git@github.com:ybrackenier/3D-moco-siemens.git
-cd 3D-moco-siemens
-git clone git@github.com:ybrackenier/brackenier-tools.git
-git clone git@github.com:ybrackenier/dhcp-repo-release07.git
+
+Clone the repository and add it to your MATLAB path. The workflow already uses:
+
+```matlab
+addpath(genpath(pwd))
 ```
 
-## Usage
-First, the names of the files that need to be reconstructed must be provided in the script /Studies/studies.m.
-Next, the script deployRecon.m needs to be run. The output will automatically be written into the next folders:
-- *.mat: These are the raw data files after converting the raw Siemens files (.dat files).
-- *.json: These are the JSON files that contain most of the raw data and sequence parameters. This can be useful to skim the sequence and acquisition setup.
-  
-- An-Ve/: The NIFTI files of the reconstructions. Files with the suffix **_Aq** are the uncorrected files whereas the suffix **_Di** indicates motion-corrected files.
-- An-Ve_Sn/: The snapshots of (intermediate) results.
-- An-Ve_Log/: The log files of the reconstruction. This can be useful to assess convergence, resolution levels, etc.
-  
-- Re-Se/: The sensitivity maps stored as NIFTI images.
-- Re-Se_Sn/: Snapshots of the sensitivity estimation process.
-- Re-Se_Log/: The log files of the sensitivity estimation.
+so the included helper code under this repository is made available automatically when launched from the project root.
 
-- Parsing_Sn: Snapshots of the raw data parsing.
-- Parsin_Log/: The log files of the data parsing step.
+If you are preparing a fresh environment, make sure the following are ready before running the batch workflow:
+
+1. MATLAB R2019a or a compatible MATLAB release
+2. Image Processing Toolbox
+3. A Python environment with `numpy`, `scipy`, and `nibabel`
+4. nnUNetv2 installed and callable from that environment
+5. The released head and teeth nnUNet model weights downloaded from Hugging Face
+
+## Data Layout
+
+The batch workflow expects case folders under `Studies-deploy/`, for example:
+
+```text
+Studies-deploy/
+  1/
+    *.dat
+  2/
+    *.dat
+```
+
+During processing, outputs are written into folders such as:
+
+- `An-Aq/`: baseline reconstruction and segmentation-related intermediates
+- `An-Ve/`: motion-corrected reconstructions and fused images
+- `An-Aq/seg/`: restored head and teeth masks used by the workflow
+
+## Quick Test with Demo Cases
+
+We will provide demonstration cases through Zenodo so users can test the released workflow without preparing their own dataset first.
+
+Recommended quick-start:
+
+1. Download and unpack the demo data from Zenodo.
+2. Place the demo case folders inside `Studies-deploy/`.
+3. Download the trained nnUNet models from Hugging Face and install them into your local nnUNetv2 setup.
+4. Open [batch_dental_multiple.m](/Users/ningzihan/Documents/dental_moco/batch_dental_multiple.m) in MATLAB.
+5. Update the local configuration as needed:
+   - `rootFolder`
+   - `caseList`
+   - `seqSelect`
+   - `CONDA`
+   - `ENVNAME`
+   - `NNUNET_BASE`
+6. Run `batch_dental_multiple`.
+
+For a minimal test, start with a single case:
+
+```matlab
+rootFolder  = './Studies-deploy';
+caseList    = [1];
+seqSelect   = {'MPRAGE','T2wSPACE','PDwSPACE'};
+```
+
+## What the Batch Workflow Does
+
+For each selected case and sequence, `batch_dental_multiple.m` performs:
+
+1. baseline SENSE reconstruction
+2. preprocessing for nnUNet inference
+3. teeth segmentation
+4. head segmentation
+5. restoration of masks to the original resolution and field of view
+6. landmark extraction from the teeth mask
+7. region-specific motion-corrected reconstruction
+8. fusion of upper-jaw and lower-jaw motion-corrected images
+
+The fused image is saved in `An-Ve/` together with the other reconstruction outputs.
+
+## Notes on Current Configuration
+
+This repository currently includes some environment-specific paths in the MATLAB scripts, for example Conda and nnUNet installation locations. These should be treated as templates and adapted locally before use.
+
+The present workflow has been developed and tested in our server environment. If you are porting it to a new machine, the main things to check first are:
+
+- MATLAB version and toolbox availability
+- Python environment activation
+- nnUNetv2 installation and path variables
+- location of downloaded trained weights
+- case folder layout under `Studies-deploy/`
+
+## Acknowledgements
+
+This repository builds on included code from:
+
+- `brackenier-tools`
+- `dhcp-repo-release07`
+
+We thank the original contributors to those components.
+
+## Citation
+
+If you use this code, please cite the accompanying paper:
+
+**Motion-Robust Dental MRI for Imaging of Paediatric Dental Trauma**
+
+Citation details will be added here upon publication.
 
 ## Contributors
-Yannick Brackenier & Lucilio Cordero-Grande
+
+Zihan Ning and collaborators.
 
 ## License
 
-
-
+License information will be added as part of the public release.
