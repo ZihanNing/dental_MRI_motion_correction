@@ -21,16 +21,14 @@ The core workflow is implemented in [batch_dental_multiple.m](https://github.com
 
 ## Release Plan
 
-The full open-source release is split across three locations:
+The full open-source release is split across two locations:
 
 - **GitHub repository**: MATLAB workflow, reconstruction code, and utility scripts
-- **Hugging Face**: trained nnUNetv2 models for head segmentation and teeth segmentation
-- **Zenodo**: demo cases for testing the released pipeline
+- **Zenodo**: demo raw data and trained nnUNetv2 models for head segmentation and teeth segmentation
 
-Release links will be added here when public:
+Data and trained model download:
 
-- Hugging Face models: `TBD`
-- Zenodo demo cases: `TBD`
+- Zenodo record: [https://zenodo.org/records/20544237](https://zenodo.org/records/20544237)
 
 ## Requirements
 
@@ -86,7 +84,11 @@ The repository does **not** store the trained nnUNet model weights directly. Ins
 - teeth segmentation
 - head segmentation
 
-will be distributed separately on Hugging Face. After downloading them, place them into the nnUNet results structure expected by your local nnUNetv2 installation.
+are distributed together with the demo raw data on Zenodo:
+
+- [https://zenodo.org/records/20544237](https://zenodo.org/records/20544237)
+
+After downloading them, place them into the nnUNet results structure expected by your local nnUNetv2 installation.
 
 ## Installation
 
@@ -104,7 +106,7 @@ If you are preparing a fresh environment, make sure the following are ready befo
 2. Image Processing Toolbox
 3. A Python environment with `numpy`, `scipy`, and `nibabel`
 4. nnUNetv2 installed and callable from that environment
-5. The released head and teeth nnUNet model weights downloaded from Hugging Face
+5. The released demo raw data and head/teeth nnUNet model weights downloaded from Zenodo
 
 ## Data Layout
 
@@ -126,16 +128,67 @@ During processing, outputs are written into folders such as:
 
 ## Quick Test with Demo Cases
 
-We will provide demonstration cases through Zenodo so users can test the released workflow without preparing their own dataset first.
+Demo raw data and trained nnUNetv2 models are provided through Zenodo so users can test the released workflow without preparing their own dataset first:
+
+- [https://zenodo.org/records/20544237](https://zenodo.org/records/20544237)
 
 Recommended quick-start:
 
-1. Download and unpack the demo data from Zenodo.
-2. Place the demo case folders inside `Studies-deploy/`.
-3. Download the trained nnUNet models from Hugging Face and install them into your local nnUNetv2 setup.
-4. Open [batch_dental_multiple.m](https://github.com/ZihanNing/dental_MRI_motion_correction/blob/main/batch_dental_multiple.m) in MATLAB.
-5. Update the local configuration as needed: `rootFolder`, `caseList`, `seqSelect`, `CONDA`, `ENVNAME`, and `NNUNET_BASE`.
-6. Run `batch_dental_multiple`.
+1. Clone this GitHub repository and start MATLAB from the repository root.
+2. Download and unpack the demo raw data and trained nnUNetv2 model folders from Zenodo.
+3. Place the unpacked demo case folders inside `Studies-deploy/`. The expected layout is:
+
+```text
+Studies-deploy/
+  1/
+    *.dat
+  2/
+    *.dat
+```
+
+4. Install nnUNetv2 locally by following the official nnUNetv2 installation instructions.
+5. Locate the trained nnUNetv2 model folders downloaded from Zenodo:
+
+```text
+Dataset003_Dental_autolandmark_PDwMPRAGET2w
+Dataset004_Dental_headseg_PDT1T2
+```
+
+6. Place the downloaded model folders under your local `nnUNet_results` directory. For example, if your nnUNet workspace is `/path/to/nnUNet`, the expected layout is:
+
+```text
+/path/to/nnUNet/
+  nnUNet_raw/
+  nnUNet_preprocessed/
+  nnUNet_results/
+    Dataset003_Dental_autolandmark_PDwMPRAGET2w/
+    Dataset004_Dental_headseg_PDT1T2/
+```
+
+7. Open [batch_dental_multiple.m](https://github.com/ZihanNing/dental_MRI_motion_correction/blob/main/batch_dental_multiple.m) in MATLAB.
+8. Update the demo case settings near the top of the script if needed:
+
+```matlab
+rootFolder  = './Studies-deploy';
+caseList    = [1];
+seqSelect   = {'MPRAGE','T2wSPACE','PDwSPACE'};
+```
+
+9. Update the local Python and nnUNet paths in the script:
+
+```matlab
+CONDA = '/path/to/anaconda3/bin/conda';
+ENVNAME = 'nnunetv2';
+NNUNET_BASE = '/path/to/nnUNet';
+```
+
+`NNUNET_BASE` should point to the folder that contains `nnUNet_raw`, `nnUNet_preprocessed`, and `nnUNet_results`. The batch script sets these nnUNet environment variables automatically from `NNUNET_BASE` before calling `nnUNetv2_predict`.
+
+10. Run the batch workflow from MATLAB:
+
+```matlab
+batch_dental_multiple
+```
 
 For a minimal test, start with a single case:
 
@@ -195,4 +248,8 @@ Zihan Ning and collaborators.
 
 ## License
 
-License information will be added as part of the public release.
+This repository is released under the **Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)**, unless otherwise stated.
+
+This means that public use, sharing, and modification are allowed with appropriate attribution, but commercial use is not permitted.
+
+See [LICENSE](./LICENSE) for details. Third-party code and dependencies included in this repository, including `brackenier-tools` and `dhcp-repo-release07`, remain subject to their own original license terms.

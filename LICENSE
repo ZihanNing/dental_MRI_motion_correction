@@ -1,21 +1,36 @@
-MIT License
+Creative Commons Attribution-NonCommercial 4.0 International
 
-Copyright (c) 2026 Zihan Ning
+SPDX-License-Identifier: CC-BY-NC-4.0
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Copyright (c) 2026 Zihan Ning and collaborators.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This repository is licensed under the Creative Commons
+Attribution-NonCommercial 4.0 International Public License (CC BY-NC 4.0),
+unless otherwise stated.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+You are free to:
+
+- Share: copy and redistribute the material in any medium or format.
+- Adapt: remix, transform, and build upon the material.
+
+Under the following terms:
+
+- Attribution: You must give appropriate credit, provide a link to the
+  license, and indicate if changes were made.
+- NonCommercial: You may not use the material for commercial purposes.
+- No additional restrictions: You may not apply legal terms or technological
+  measures that legally restrict others from doing anything the license
+  permits.
+
+The full license text is available at:
+
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
+Human-readable summary:
+
+https://creativecommons.org/licenses/by-nc/4.0/
+
+The material is provided "as is", without warranties or conditions of any
+kind. This license does not override the licenses of third-party code or
+dependencies included in or used by this repository. Such third-party
+components remain subject to their own original license terms.
